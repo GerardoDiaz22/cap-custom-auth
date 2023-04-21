@@ -1,0 +1,26 @@
+<head>
+  <link rel="stylesheet" href="/styles/custom-style.css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="main-container">
+    <div class="profile-container">
+      <h1 class="profile-greeting">Hi! <%= username %></h1>
+      <form action="/logout" method="POST">
+        <button type="submit">Logout</button>
+      </form>
+    </div>
+    <div class="tiles-container">
+      <a href="/service/products/Products">
+        <div class="tile">
+          <p>Products Service</p>
+        </div>
+      </a>
+      <a href="/products-worklist/webapp/index.html">
+        <div class="tile">
+          <p>Products Worklist</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</body>
