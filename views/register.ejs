@@ -19,6 +19,12 @@
           <label for="password">Password</label>
           <input type="password" name="password" id="password" required />
         </div>
+        <div class="radio-group">
+          <input type="radio" name="role" id="role-common" value="common" required />
+          <label for="role-common" class="option">Common </label>
+          <input type="radio" name="role" id="role-admin" value="admin" required />
+          <label for="role-admin" class="option">Administrator </label>
+        </div>
         <div class="error"><% if (error) { %> <%= error %> <% } %></div>
         <button type="submit">Register</button>
       </form>

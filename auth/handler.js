@@ -2,11 +2,13 @@ const cds = require('@sap/cds');
 
 module.exports = (req, res, next) => {
   if (req?.user) {
-    console.log('Old user:', req.user);
-    req.user = new cds.User(req.user);
-    console.log('New user:', req.user);
+    req.user = new cds.User({
+      id: req.user.id,
+      roles: [req.user.role],
+    });
     next();
   } else {
+    console.log('Error', req.user);
     res.status(401).send();
   }
 };

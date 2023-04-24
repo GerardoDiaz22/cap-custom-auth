@@ -141,12 +141,13 @@ module.exports = async (app) => {
     }
     const username = req.body.name;
     const email = req.body.email;
+    const role = req.body.role;
     const password = await bcrypt.hash(req.body.password, 10);
     // Save user to database
     const id = await new Promise(function (resolve, reject) {
       db.run(
-        'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-        [username, email, password],
+        'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+        [username, email, password, role],
         function (err) {
           if (err) {
             return reject(err);

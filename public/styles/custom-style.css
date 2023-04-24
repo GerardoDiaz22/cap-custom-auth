@@ -145,3 +145,44 @@ a:hover {
   text-align: center;
   margin: 0;
 }
+
+.radio-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.option {
+  display: inline-block;
+  border: 2px solid var(--header-color);
+  transition: background-color 0.3s;
+  margin: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  padding: 1rem;
+  border-radius: 5px;
+  width: 45%;
+  box-sizing: border-box;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.option:hover {
+  background-color: var(--button-hover-color);
+}
+
+input[type='radio'] {
+  display: none;
+}
+
+input[type='radio']:checked + label {
+  background-color: var(--header-color);
+  color: var(--button-color);
+  font-weight: bold;
+}
+
+input[type='radio']:checked:hover + label {
+  background-color: #97978f;
+}

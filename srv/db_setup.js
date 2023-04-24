@@ -4,7 +4,8 @@ const createUsersTable = (db) => {
       id INTEGER PRIMARY KEY,
       username TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL
+      password TEXT NOT NULL,
+      role TEXT NOT NULL
     );
   `;
 
