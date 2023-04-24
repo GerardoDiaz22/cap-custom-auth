@@ -6,3 +6,8 @@ entity Products : cuid {
     stock : Integer;
     price : Decimal(10,2);
 }
+
+entity Sales : cuid {
+    name : String;
+    price : Decimal(10,2);
+}

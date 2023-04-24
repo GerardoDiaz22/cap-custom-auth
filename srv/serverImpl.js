@@ -164,5 +164,6 @@ module.exports = async (app) => {
   });
 
   // This is a catch-all route that check if the user is authorized
-  app.get('*', isNotAuthorized, (req, res, next) => next());
+  // Probably going to use app.use for this later...
+  app.use('*', isNotAuthorized, (req, res, next) => next());
 };
