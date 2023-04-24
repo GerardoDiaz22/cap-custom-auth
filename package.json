@@ -58,9 +58,11 @@
   "sapux": [
     "app/products-worklist"
   ],
-  "requires": {
-    "auth": {
-      "impl": "./auth/handler.js"
+  "cds": {
+    "requires": {
+      "auth": {
+        "impl": "./auth/handler.js"
+      }
     }
   }
 }
