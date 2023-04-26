@@ -11,3 +11,11 @@ entity Sales : cuid {
     name : String;
     price : Decimal(10,2);
 }
+
+entity Users : cuid {
+    //key id : UUID;
+    username : String NOT NULL;
+    email : String NOT NULL;
+    password : String NOT NULL;
+    role : String NOT NULL;
+}

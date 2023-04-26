@@ -3,19 +3,6 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 const sqlite3 = require('sqlite3').verbose();
-const { Pool } = require('pg')
-
-  const pool = new Pool({
-    host: '127.0.0.1',
-    user: 'postgres',
-    database: 'usuario_db',
-    password: '123456',
-    port: 5432,
-    max: 2000,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-  })
-  //console.log("pool passport",pool)
 
 const db = new sqlite3.Database('./db/data/users.db', (err) => {
   if (err) {
@@ -25,6 +12,7 @@ const db = new sqlite3.Database('./db/data/users.db', (err) => {
 });
 
 module.exports = function (passport) {
+  console.log("auth/passport.js")
   // Local Strategy
   passport.use(
     'login',
@@ -37,32 +25,22 @@ module.exports = function (passport) {
         try {
           // Find the user associated with the email provided by the user
           const user = await new Promise(function (resolve, reject) {
-
-            pool.connect((err, client, release) => {
-              if (err) {
-                return console.error('Error acquiring client', err.stack)
-              }
-              pool.query('SELECT * FROM sap_jwt_products_users WHERE email = $1', [email], (err, rows) => {
+            db.get(
+              'SELECT * FROM users WHERE email = ?',
+              [email],
+              function (err, rows) {
                 if (err) {
-                  console.error('Error executing query', err.stack)
                   return reject(err);
                 }
-                const userId = rows.rows[0]
-                //console.error('userId passport.js', userId)
-                resolve(userId);
-              })
-  
-            })
-
+                resolve(rows);
+              }
+            );
           });
-
-          console.error('user', user)
           if (!user) {
             return done(null, false, { message: 'User not found' });
           }
           // Validate password and make sure it matches with the corresponding hash stored in the database
           const validate = await bcrypt.compare(password, user.password);
-          console.error('validate', validate)
           if (!validate) {
             return done(null, false, { message: 'Wrong Password' });
           }
@@ -88,27 +66,20 @@ module.exports = function (passport) {
         secretOrKey: process.env.ACCESS_TOKEN_SECRET,
       },
       async (jwt_payload, done) => {
+        console.log("auth/passport.js jwt")
         // jwt_payload is the token payload
         try {
           const user = await new Promise(function (resolve, reject) {
-            pool.connect((err, client, release) => {
-              if (err) {
-                return console.error('Error acquiring client', err.stack)
-              }
-              console.log('jwt_payload.user.id passport.js', jwt_payload.user.id)
-              pool.query('SELECT * FROM sap_jwt_products_users WHERE id = $1', [jwt_payload.user.id], (err, rows) => {
+            db.get(
+              'SELECT * FROM users WHERE id = ?',
+              [jwt_payload.user.id],
+              function (err, rows) {
                 if (err) {
-                  console.error('Error executing query', err.stack)
                   return reject(err);
                 }
-                console.log('rows.rows passport.js', rows.rows)
-                const userId = rows.rows[0]
-                console.log('userId passport.js', userId)
-                resolve(userId);
-              })
-  
-            })
-
+                resolve(rows);
+              }
+            );
           });
           if (user) {
             return done(null, user);

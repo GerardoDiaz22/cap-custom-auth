@@ -3,7 +3,7 @@ using { sap.jwt.products as my } from '../db/schema';
 @path: 'service/products'
 service ProductsService @(requires : 'authenticated-user'){
     entity Products @(restrict: [ 
-        {grant: ['READ', 'WRITE'], to: 'admin'}
+        {grant: ['READ', 'WRITE'], to: 'admin',}
     ])
     as projection on my.Products;
 
@@ -11,4 +11,9 @@ service ProductsService @(requires : 'authenticated-user'){
         {grant: ['READ', 'WRITE'], to: ['admin', 'common']}
     ])
     as projection on my.Sales;
+
+       entity Users @(restrict: [ 
+        {grant: ['READ', 'WRITE'], to: ['admin', 'common']}
+    ])
+    as projection on my.Users;
 }

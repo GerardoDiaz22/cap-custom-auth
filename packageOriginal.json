@@ -9,10 +9,7 @@
     "@sap/cds": "^6",
     "@sap/cds-dk": "^6.7.1",
     "bcrypt": "^5.1.0",
-    "cds-dbm": "~0.0.36",
-    "cds-pg": "^0.0.51",
     "cookie-parser": "^1.4.6",
-    "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.9",
     "express": "^4",
@@ -29,14 +26,9 @@
     "sqlite3": "^5.0.4"
   },
   "scripts": {
-    "builddb": "npx cds-dbm build",
-    "deploycreatedb": "npx cds-dbm deploy --create-db",
-    "cargarCSV": "npx cds-dbm load --via full",
-    "deploydb": "npx cds-dbm deploy",
-    "start": "npx cds run",
-    "start:docker": "docker-compose up",
-    "build:cf": "mbt build",
-    "deploy:cf": "cf deploy mta_archives/devtoberfest_1.0.0.mtar"
+    "start": "cds run",
+    "watch-products-worklist": "cds watch --open products-worklist/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-sales": "cds watch --open sales/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "engines": {
     "node": "^16.15"
@@ -71,49 +63,9 @@
     "app/sales"
   ],
   "cds": {
-    "build": {
-      "tasks": [
-        {
-          "use": "node-cf",
-          "for": "node-cf",
-          "src": "srv"
-        },
-        {
-          "use": "postgres-cf",
-          "for": "postgres-cf",
-          "src": "db",
-          "options": {
-            "deployCmd": "npx cds-dbm deploy --load-via delta --auto-undeploy"
-          }
-        }
-      ]
-    },
     "requires": {
       "auth": {
         "impl": "./auth/handler.js"
-      },
-      "db": {
-        "kind": "database"
-      },
-      "database": {
-        "dialect": "plain",
-        "impl": "cds-pg",
-        "model": [
-          "srv"
-        ]
-      }
-    },
-    "migrations": {
-      "db": {
-        "schema": {
-          "default": "public",
-          "clone": "_cdsdbm_clone",
-          "reference": "_cdsdbm_ref"
-        },
-        "deploy": {
-          "tmpFile": "tmp/_autodeploy.json",
-          "undeployFile": "db/undeploy.json"
-        }
       }
     }
   }
