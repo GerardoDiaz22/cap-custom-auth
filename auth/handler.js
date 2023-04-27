@@ -8,7 +8,8 @@ module.exports = (req, res, next) => {
       roles: [req.user.role],
       attr: {
           sales : ["Electronics","Clothes"],
-          products : ["Phone"]
+          products : ["Phone"],
+          codestorg : ["1101","1102","1103","1104"]
         }
     });
     console.log('req.user', req.user);
