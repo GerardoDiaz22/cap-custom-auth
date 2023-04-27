@@ -46,7 +46,7 @@ module.exports = async (app) => {
     database: 'formulador_db',
     password: '123456',
     port: 5432,
-    max: 5,
+    max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
   })
