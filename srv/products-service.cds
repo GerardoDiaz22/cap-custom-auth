@@ -25,4 +25,10 @@ service ProductsService @(requires : 'authenticated-user'){
         {grant: ['READ'], to: ['common'], where: 'codestorg = $user.codestorg'}
     ])
     as projection on my.GastosNoDistribuibles;
+
+    entity Ejercicio @(restrict: [ 
+        {grant: ['*'], to: ['admin']},
+        {grant: ['READ'], to: ['common']}
+    ])
+    as projection on my.GastosNoDistribuibles;
 }

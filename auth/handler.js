@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
       attr: {
           sales : ["Electronics","Clothes"],
           products : ["Phone"],
-          codestorg : ["1101","1102","1103","1104"]
+          codestorg : ["1101","1102"]
         }
     });
     console.log('req.user', req.user);

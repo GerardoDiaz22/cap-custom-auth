@@ -33,7 +33,7 @@ module.exports = async (app) => {
   const client = new Client({
     host: '127.0.0.1',
     user: 'postgres',
-    database: 'usuario_db',
+    database: 'formulador_db',
     password: '123456',
     port: 5432,
   });
@@ -43,7 +43,7 @@ module.exports = async (app) => {
   const pool = new Pool({
     host: '127.0.0.1',
     user: 'postgres',
-    database: 'usuario_db',
+    database: 'formulador_db',
     password: '123456',
     port: 5432,
     max: 20,
