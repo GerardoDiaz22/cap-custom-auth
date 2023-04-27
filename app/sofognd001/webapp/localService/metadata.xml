@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="ProductsService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="Products" EntityType="ProductsService.Products"/>
+                <EntitySet Name="Sales" EntityType="ProductsService.Sales"/>
+                <EntitySet Name="Users" EntityType="ProductsService.Users"/>
+                <EntitySet Name="GastosNoDistribuibles" EntityType="ProductsService.GastosNoDistribuibles"/>
+                <EntitySet Name="Ejercicio" EntityType="ProductsService.Ejercicio"/>
+            </EntityContainer>
+            <EntityType Name="Products">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="name" Type="Edm.String"/>
+                <Property Name="stock" Type="Edm.Int32"/>
+                <Property Name="price" Type="Edm.Decimal" Scale="2" Precision="10"/>
+            </EntityType>
+            <EntityType Name="Sales">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="name" Type="Edm.String"/>
+                <Property Name="price" Type="Edm.Decimal" Scale="2" Precision="10"/>
+            </EntityType>
+            <EntityType Name="Users">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="username" Type="Edm.String" Nullable="false"/>
+                <Property Name="email" Type="Edm.String" Nullable="false"/>
+                <Property Name="password" Type="Edm.String" Nullable="false"/>
+                <Property Name="role" Type="Edm.String" Nullable="false"/>
+            </EntityType>
+            <EntityType Name="GastosNoDistribuibles">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="estorg" Type="Edm.String" Nullable="false"/>
+                <Property Name="codestorg" Type="Edm.String" Nullable="false"/>
+                <Property Name="moneda" Type="Edm.String" Nullable="false"/>
+                <Property Name="codcuentacontable" Type="Edm.String" Nullable="false"/>
+                <Property Name="importemes01" Type="Edm.Decimal" Scale="2" Precision="10"/>
+                <Property Name="importemes02" Type="Edm.Decimal" Scale="2" Precision="10"/>
+                <Property Name="importemes03" Type="Edm.Decimal" Scale="2" Precision="10"/>
+                <Property Name="importemes04" Type="Edm.Decimal" Scale="2" Precision="10"/>
+                <Property Name="mes01" Type="Edm.Int32"/>
+                <Property Name="mes02" Type="Edm.Int32"/>
+                <Property Name="mes03" Type="Edm.Int32"/>
+                <Property Name="mes04" Type="Edm.Int32"/>
+                <Property Name="ejercicio" Type="Edm.Int32"/>
+                <Property Name="ejerciciobase" Type="Edm.Int32"/>
+                <Property Name="bloqueadousuario" Type="Edm.Boolean"/>
+                <Property Name="bloqueadoadmin" Type="Edm.Boolean"/>
+            </EntityType>
+            <EntityType Name="Ejercicio">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="estorg" Type="Edm.String" Nullable="false"/>
+                <Property Name="codestorg" Type="Edm.String" Nullable="false"/>
+                <Property Name="moneda" Type="Edm.String" Nullable="false"/>
+                <Property Name="codcuentacontable" Type="Edm.String" Nullable="false"/>
+                <Property Name="importemes01" Type="Edm.Decimal" Scale="2" Precision="10"/>
+                <Property Name="importemes02" Type="Edm.Decimal" Scale="2" Precision="10"/>
+                <Property Name="importemes03" Type="Edm.Decimal" Scale="2" Precision="10"/>
+                <Property Name="importemes04" Type="Edm.Decimal" Scale="2" Precision="10"/>
+                <Property Name="mes01" Type="Edm.Int32"/>
+                <Property Name="mes02" Type="Edm.Int32"/>
+                <Property Name="mes03" Type="Edm.Int32"/>
+                <Property Name="mes04" Type="Edm.Int32"/>
+                <Property Name="ejercicio" Type="Edm.Int32"/>
+                <Property Name="ejerciciobase" Type="Edm.Int32"/>
+                <Property Name="bloqueadousuario" Type="Edm.Boolean"/>
+                <Property Name="bloqueadoadmin" Type="Edm.Boolean"/>
+            </EntityType>
+            <Annotations Target="ProductsService.Products">
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="name"/>
+                            <PropertyValue Property="Value" Path="name"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="stock"/>
+                            <PropertyValue Property="Value" Path="stock"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="price"/>
+                            <PropertyValue Property="Value" Path="price"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="GeneratedGroup1">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="name"/>
+                                    <PropertyValue Property="Value" Path="name"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="stock"/>
+                                    <PropertyValue Property="Value" Path="stock"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="price"/>
+                                    <PropertyValue Property="Value" Path="price"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="GeneratedFacet1"/>
+                            <PropertyValue Property="Label" String="General Information"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#GeneratedGroup1"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ProductsService.Sales">
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="name"/>
+                            <PropertyValue Property="Value" Path="name"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="price"/>
+                            <PropertyValue Property="Value" Path="price"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="GeneratedGroup1">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="name"/>
+                                    <PropertyValue Property="Value" Path="name"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="price"/>
+                                    <PropertyValue Property="Value" Path="price"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="GeneratedFacet1"/>
+                            <PropertyValue Property="Label" String="General Information"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#GeneratedGroup1"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

@@ -1,0 +1,119 @@
+<edmx:Edmx xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" Version="4.0">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/here/goes/your/serviceurl/$metadata">
+        <edmx:Include Namespace="ProductsService"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="local">
+            <Annotations Target="ProductsService.GastosNoDistribuibles">
+                <Annotation Term="UI.LineItem">
+                    <Collection>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="estorg"/>
+                            <PropertyValue Property="Value" Path="estorg"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="codestorg"/>
+                            <PropertyValue Property="Value" Path="codestorg"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="moneda"/>
+                            <PropertyValue Property="Value" Path="moneda"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="codcuentacontable"/>
+                            <PropertyValue Property="Value" Path="codcuentacontable"/>
+                        </Record>
+                        <Record Type="UI.DataField">
+                            <PropertyValue Property="Label" String="importemes01"/>
+                            <PropertyValue Property="Value" Path="importemes01"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="UI.FieldGroup" Qualifier="GeneratedGroup1">
+                    <Record Type="UI.FieldGroupType">
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="estorg"/>
+                                    <PropertyValue Property="Value" Path="estorg"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="codestorg"/>
+                                    <PropertyValue Property="Value" Path="codestorg"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="moneda"/>
+                                    <PropertyValue Property="Value" Path="moneda"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="codcuentacontable"/>
+                                    <PropertyValue Property="Value" Path="codcuentacontable"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="importemes01"/>
+                                    <PropertyValue Property="Value" Path="importemes01"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="importemes02"/>
+                                    <PropertyValue Property="Value" Path="importemes02"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="importemes03"/>
+                                    <PropertyValue Property="Value" Path="importemes03"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="importemes04"/>
+                                    <PropertyValue Property="Value" Path="importemes04"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="mes01"/>
+                                    <PropertyValue Property="Value" Path="mes01"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="mes02"/>
+                                    <PropertyValue Property="Value" Path="mes02"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="mes03"/>
+                                    <PropertyValue Property="Value" Path="mes03"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="mes04"/>
+                                    <PropertyValue Property="Value" Path="mes04"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="ejercicio"/>
+                                    <PropertyValue Property="Value" Path="ejercicio"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="ejerciciobase"/>
+                                    <PropertyValue Property="Value" Path="ejerciciobase"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="bloqueadousuario"/>
+                                    <PropertyValue Property="Value" Path="bloqueadousuario"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="bloqueadoadmin"/>
+                                    <PropertyValue Property="Value" Path="bloqueadoadmin"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="GeneratedFacet1"/>
+                            <PropertyValue Property="Label" String="General Information"/>
+                            <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#GeneratedGroup1"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

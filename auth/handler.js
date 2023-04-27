@@ -7,10 +7,10 @@ module.exports = (req, res, next) => {
       id: req.user.id,
       roles: [req.user.role],
       attr: {
-          sales : ["Electronics","Clothes"],
-          products : ["Phone"],
-          codestorg : ["1101","1102"]
-        }
+            sales : ["Electronics","Clothes"],
+            products : ["Phone"],
+            codestorg : ["1101","1102"]
+          }
     });
     console.log('req.user', req.user);
     next();

@@ -68,7 +68,8 @@
   },
   "sapux": [
     "app/products-worklist",
-    "app/sales"
+    "app/sales",
+    "app/sofognd002"
   ],
   "cds": {
     "build": {
