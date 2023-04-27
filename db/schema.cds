@@ -13,7 +13,6 @@ entity Sales : cuid {
 }
 
 entity Users : cuid {
-    //key id : UUID;
     username : String NOT NULL;
     email : String NOT NULL;
     password : String NOT NULL;

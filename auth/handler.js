@@ -5,7 +5,12 @@ module.exports = (req, res, next) => {
     req.user = new cds.User({
       id: req.user.id,
       roles: [req.user.role],
+      attr: {
+          sales : ["Electronics","Clothes"],
+          products : ["Phone"]
+        }
     });
+    console.log('req.user', req.user);
     next();
   } else {
     console.log('Error', req.user);
