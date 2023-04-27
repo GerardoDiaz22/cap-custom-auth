@@ -1,6 +1,7 @@
 const cds = require('@sap/cds');
 
 module.exports = (req, res, next) => {
+  console.log("req.user",req.user) 
   if (req?.user) {
     req.user = new cds.User({
       id: req.user.id,

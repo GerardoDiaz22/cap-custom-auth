@@ -1,2 +1,3 @@
 username; email; password; role
 aaa;aaa@aaa.aaa;$2b$10$4F7SZy6.xVeh5mGIH/4b9OFsSW9YtaSaXmq7Oh1ZuiUQXXGymGfwm;admin
+bbb;bbb@bbb.bbb;$2b$10$4F7SZy6.xVeh5mGIH/4b9OFsSW9YtaSaXmq7Oh1ZuiUQXXGymGfwm;common
