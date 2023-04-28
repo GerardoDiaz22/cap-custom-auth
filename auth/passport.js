@@ -2,15 +2,7 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
-const sqlite3 = require('sqlite3').verbose();
 const { Pool } = require('pg');
-
-const db = new sqlite3.Database('./db/data/users.db', (err) => {
-  if (err) {
-    console.error('Error connecting to the database:', err);
-  }
-  //console.log('Connected to the database.');
-});
 
 const pool = new Pool({
   user: 'postgres',
@@ -37,14 +29,6 @@ module.exports = function (passport) {
         try {
           // Find the user associated with the email provided by the user
           const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-          /*const user = await new Promise(function (resolve, reject) {
-            db.get('SELECT * FROM users WHERE email = ?', [email], function (err, rows) {
-              if (err) {
-                return reject(err);
-              }
-              resolve(rows);
-            });
-          });*/
           if (!user.rowCount) {
             return done(null, false, { message: 'User not found' });
           }
@@ -83,14 +67,6 @@ module.exports = function (passport) {
           const user = await client.query('SELECT * FROM users WHERE id = $1', [
             jwt_payload.user.id,
           ]);
-          /*const user = await new Promise(function (resolve, reject) {
-            db.get('SELECT * FROM users WHERE id = ?', [jwt_payload.user.id], function (err, rows) {
-              if (err) {
-                return reject(err);
-              }
-              resolve(rows);
-            });
-          });*/
           if (user.rowCount) {
             return done(null, user.rows[0]);
           } else {

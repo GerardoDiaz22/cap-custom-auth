@@ -2,11 +2,21 @@ require('dotenv').config();
 const express = require('express');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
+
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'users_db',
+  password: 'www',
+  port: '5432',
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
 
 module.exports = async (app) => {
   // parse application/json
@@ -17,29 +27,6 @@ module.exports = async (app) => {
 
   // parse cookies
   app.use(cookieParser());
-
-  // Initialize the SQLite database connection
-  const { createUsersTable } = require('./db_setup');
-  const db = new sqlite3.Database('./db/data/users.db', (err) => {
-    if (err) {
-      console.error('Error connecting to the database:', err);
-    } else {
-      console.log('Connected to the SQLite database');
-      // Call the createUsersTable function after connecting to the database
-      createUsersTable(db);
-    }
-  });
-
-  const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'users_db',
-    password: 'www',
-    port: '5432',
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
-  });
 
   // initialize passport
   app.use(passport.initialize());
@@ -124,14 +111,6 @@ module.exports = async (app) => {
         try {
           // Generate and return JWT token
           const userID = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
-          /*const id = await new Promise(function (resolve, reject) {
-            db.get('SELECT id FROM users WHERE email = ?', [user.email], function (err, rows) {
-              if (err) {
-                return reject(err);
-              }
-              resolve(rows);
-            });
-          });*/
           const token = jwt.sign({ user: userID.rows[0] }, process.env.ACCESS_TOKEN_SECRET);
           res.cookie('jwt', token, {
             httpOnly: true,
@@ -154,14 +133,6 @@ module.exports = async (app) => {
       const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [
         req.body.email,
       ]);
-      /*const existingUser = await new Promise(function (resolve, reject) {
-        db.get('SELECT * FROM users WHERE email = ?', [req.body.email], function (err, rows) {
-          if (err) {
-            return reject(err);
-          }
-          resolve(rows);
-        });
-      });*/
       if (existingUser.rowCount) {
         const message = 'Email already exists';
         return res.redirect(`/register?message=${encodeURIComponent(message)}`);
@@ -175,18 +146,6 @@ module.exports = async (app) => {
         'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id',
         [username, email, password, role]
       );
-      /*const id = await new Promise(function (resolve, reject) {
-        db.run(
-          'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
-          [username, email, password, role],
-          function (err) {
-            if (err) {
-              return reject(err);
-            }
-            resolve(this.lastID);
-          }
-        );
-      });*/
       // Generate and return JWT token
       const token = jwt.sign({ user: userID.rows[0] }, process.env.ACCESS_TOKEN_SECRET);
       res.cookie('jwt', token, {
