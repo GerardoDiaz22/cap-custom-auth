@@ -6,6 +6,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { Pool } = require('pg');
 
 module.exports = async (app) => {
   // parse application/json
@@ -27,6 +28,17 @@ module.exports = async (app) => {
       // Call the createUsersTable function after connecting to the database
       createUsersTable(db);
     }
+  });
+
+  const pool = new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'users_db',
+    password: 'www',
+    port: '5432',
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
   });
 
   // initialize passport
@@ -60,6 +72,7 @@ module.exports = async (app) => {
         next();
       } else {
         // This was the only way i found to change the default err message of JwtStrategy
+        info.message = info.message ? info.message : 'Unkown error';
         info.message = info.message === 'No auth token' ? 'Forbidden Access' : info.message;
         res.redirect(`/error?message=${encodeURIComponent(info.message)}`);
       }
@@ -107,17 +120,19 @@ module.exports = async (app) => {
         if (err) {
           res.send(err);
         }
+        const client = await pool.connect();
         try {
           // Generate and return JWT token
-          const id = await new Promise(function (resolve, reject) {
+          const userID = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
+          /*const id = await new Promise(function (resolve, reject) {
             db.get('SELECT id FROM users WHERE email = ?', [user.email], function (err, rows) {
               if (err) {
                 return reject(err);
               }
               resolve(rows);
             });
-          });
-          const token = jwt.sign({ user: id }, process.env.ACCESS_TOKEN_SECRET);
+          });*/
+          const token = jwt.sign({ user: userID.rows[0] }, process.env.ACCESS_TOKEN_SECRET);
           res.cookie('jwt', token, {
             httpOnly: true,
             // secure: true, // Uncomment this on production
@@ -126,22 +141,28 @@ module.exports = async (app) => {
           return res.redirect('/launchpad');
         } catch (err) {
           return res.redirect(`/login?message=${encodeURIComponent(err)}`);
+        } finally {
+          client.release();
         }
       });
     })(req, res, next);
   });
 
   app.post('/register', async (req, res, next) => {
+    const client = await pool.connect();
     try {
-      const existingUser = await new Promise(function (resolve, reject) {
+      const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [
+        req.body.email,
+      ]);
+      /*const existingUser = await new Promise(function (resolve, reject) {
         db.get('SELECT * FROM users WHERE email = ?', [req.body.email], function (err, rows) {
           if (err) {
             return reject(err);
           }
           resolve(rows);
         });
-      });
-      if (existingUser) {
+      });*/
+      if (existingUser.rowCount) {
         const message = 'Email already exists';
         return res.redirect(`/register?message=${encodeURIComponent(message)}`);
       }
@@ -150,7 +171,11 @@ module.exports = async (app) => {
       const role = req.body.role;
       const password = await bcrypt.hash(req.body.password, 10);
       // Save user to database
-      const id = await new Promise(function (resolve, reject) {
+      const userID = await client.query(
+        'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id',
+        [username, email, password, role]
+      );
+      /*const id = await new Promise(function (resolve, reject) {
         db.run(
           'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
           [username, email, password, role],
@@ -161,9 +186,9 @@ module.exports = async (app) => {
             resolve(this.lastID);
           }
         );
-      });
+      });*/
       // Generate and return JWT token
-      const token = jwt.sign({ user: id }, process.env.ACCESS_TOKEN_SECRET);
+      const token = jwt.sign({ user: userID.rows[0] }, process.env.ACCESS_TOKEN_SECRET);
       res.cookie('jwt', token, {
         httpOnly: true,
         // secure: true, // Uncomment this on production
@@ -172,6 +197,8 @@ module.exports = async (app) => {
       return res.redirect('/login');
     } catch (err) {
       return res.redirect(`/register?message=${encodeURIComponent(err)}`);
+    } finally {
+      client.release();
     }
   });
 
