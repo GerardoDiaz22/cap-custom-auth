@@ -1,4 +1,10 @@
-name; stock; price
-Phone; 10; 50.0
-Laptop; 6; 400.0
-Table; 300; 5.0
+sociedad; name; stock; price
+1001; Smartphone X; 11; 58.99
+1001; Smartwatch Y; 9; 199.99
+1001; Earbuds Z; 15; 99.99
+1002; Gaming Laptop A; 6; 1299.99
+1002; Ultrabook B; 5; 899.99
+1003; Wooden Table C; 250; 199.99
+1003; Glass Table D; 200; 299.99
+1003; Metal Table E; 300; 249.99
+1003; Marble Table F; 100; 599.99

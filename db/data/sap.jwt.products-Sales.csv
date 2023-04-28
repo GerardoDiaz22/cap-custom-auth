@@ -1,4 +1,4 @@
-name;  price
-Food;  50.0
-Electronics; 400.0
-Clothes;  5.0
+sociedad; centro; oficina; name;  price
+1001; 1001; 1001; Food;  50.0
+1001; 1002; 1003; Electronics; 400.0
+1002; 1001; 1002; Clothes;  5.0

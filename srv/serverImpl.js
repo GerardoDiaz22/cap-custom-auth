@@ -140,11 +140,12 @@ module.exports = async (app) => {
       const username = req.body.name;
       const email = req.body.email;
       const role = req.body.role;
+      const workstation = req.body.workstation;
       const password = await bcrypt.hash(req.body.password, 10);
       // Save user to database
       const userID = await client.query(
-        'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id',
-        [username, email, password, role]
+        'INSERT INTO users (username, email, password, role, workstation) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+        [username, email, password, role, workstation]
       );
       // Generate and return JWT token
       const token = jwt.sign({ user: userID.rows[0] }, process.env.ACCESS_TOKEN_SECRET);
