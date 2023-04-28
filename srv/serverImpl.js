@@ -107,60 +107,72 @@ module.exports = async (app) => {
         if (err) {
           res.send(err);
         }
-        // Generate and return JWT token
-        const id = await new Promise(function (resolve, reject) {
-          db.get('SELECT id FROM users WHERE email = ?', [user.email], function (err, rows) {
-            if (err) {
-              return reject(err);
-            }
-            resolve(rows);
+        try {
+          // Generate and return JWT token
+          const id = await new Promise(function (resolve, reject) {
+            db.get('SELECT id FROM users WHERE email = ?', [user.email], function (err, rows) {
+              if (err) {
+                return reject(err);
+              }
+              resolve(rows);
+            });
           });
-        });
-        const token = jwt.sign({ user: id }, process.env.ACCESS_TOKEN_SECRET);
-        res.cookie('jwt', token, {
-          httpOnly: true,
-        });
-        // return res.json({ token });
-        return res.redirect('/launchpad');
+          const token = jwt.sign({ user: id }, process.env.ACCESS_TOKEN_SECRET);
+          res.cookie('jwt', token, {
+            httpOnly: true,
+            // secure: true, // Uncomment this on production
+          });
+          // return res.json({ token });
+          return res.redirect('/launchpad');
+        } catch (err) {
+          return res.redirect(`/login?message=${encodeURIComponent(err)}`);
+        }
       });
     })(req, res, next);
   });
 
   app.post('/register', async (req, res, next) => {
-    const existingUser = await new Promise(function (resolve, reject) {
-      db.get('SELECT * FROM users WHERE email = ?', [req.body.email], function (err, rows) {
-        if (err) {
-          return reject(err);
-        }
-        resolve(rows);
-      });
-    });
-    if (existingUser) {
-      const message = 'Email already exists';
-      return res.redirect(`/register?message=${encodeURIComponent(message)}`);
-    }
-    const username = req.body.name;
-    const email = req.body.email;
-    const role = req.body.role;
-    const password = await bcrypt.hash(req.body.password, 10);
-    // Save user to database
-    const id = await new Promise(function (resolve, reject) {
-      db.run(
-        'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
-        [username, email, password, role],
-        function (err) {
+    try {
+      const existingUser = await new Promise(function (resolve, reject) {
+        db.get('SELECT * FROM users WHERE email = ?', [req.body.email], function (err, rows) {
           if (err) {
             return reject(err);
           }
-          resolve(this.lastID);
-        }
-      );
-    });
-    // Generate and return JWT token
-    const token = jwt.sign({ user: id }, process.env.ACCESS_TOKEN_SECRET);
-    res.cookie('jwt', token, { httpOnly: true });
-    // return res.json({ token });
-    return res.redirect('/login');
+          resolve(rows);
+        });
+      });
+      if (existingUser) {
+        const message = 'Email already exists';
+        return res.redirect(`/register?message=${encodeURIComponent(message)}`);
+      }
+      const username = req.body.name;
+      const email = req.body.email;
+      const role = req.body.role;
+      const password = await bcrypt.hash(req.body.password, 10);
+      // Save user to database
+      const id = await new Promise(function (resolve, reject) {
+        db.run(
+          'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+          [username, email, password, role],
+          function (err) {
+            if (err) {
+              return reject(err);
+            }
+            resolve(this.lastID);
+          }
+        );
+      });
+      // Generate and return JWT token
+      const token = jwt.sign({ user: id }, process.env.ACCESS_TOKEN_SECRET);
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        // secure: true, // Uncomment this on production
+      });
+      // return res.json({ token });
+      return res.redirect('/login');
+    } catch (err) {
+      return res.redirect(`/register?message=${encodeURIComponent(err)}`);
+    }
   });
 
   // This is a catch-all route that check if the user is authorized
