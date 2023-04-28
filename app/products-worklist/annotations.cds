@@ -4,17 +4,22 @@ annotate service.Products with @(
     UI.LineItem : [
         {
             $Type : 'UI.DataField',
-            Label : 'name',
+            Label : 'Sociedad',
+            Value : sociedad,
+        },
+        {
+            $Type : 'UI.DataField',
+            Label : 'Name',
             Value : name,
         },
         {
             $Type : 'UI.DataField',
-            Label : 'stock',
+            Label : 'Stock',
             Value : stock,
         },
         {
             $Type : 'UI.DataField',
-            Label : 'price',
+            Label : 'Price',
             Value : price,
         },
     ]
@@ -24,18 +29,23 @@ annotate service.Products with @(
         $Type : 'UI.FieldGroupType',
         Data : [
             {
+            $Type : 'UI.DataField',
+            Label : 'Sociedad',
+            Value : sociedad,
+            },
+            {
                 $Type : 'UI.DataField',
-                Label : 'name',
+                Label : 'Name',
                 Value : name,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'stock',
+                Label : 'Stock',
                 Value : stock,
             },
             {
                 $Type : 'UI.DataField',
-                Label : 'price',
+                Label : 'Price',
                 Value : price,
             },
         ],
