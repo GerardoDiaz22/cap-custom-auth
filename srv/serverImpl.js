@@ -18,7 +18,7 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 });
 
-module.exports = async (app) => {
+const impl = async (app) => {
   // parse application/json
   app.use(express.json());
 
@@ -166,3 +166,5 @@ module.exports = async (app) => {
   // Probably going to use app.use for this later...
   app.use('*', isNotAuthorized, (req, res, next) => next());
 };
+
+module.exports = { impl };
