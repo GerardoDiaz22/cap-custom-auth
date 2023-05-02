@@ -54,9 +54,9 @@ module.exports = function (passport) {
     new JwtStrategy(
       {
         jwtFromRequest: ExtractJwt.fromExtractors([
-          (req) => {
-            return req.cookies.jwt || null;
-          },
+          (req) => req.cookies.jwt || null,
+          // ExtractJwt.fromCookie('jwt')
+          ExtractJwt.fromAuthHeaderAsBearerToken(),
         ]),
         secretOrKey: process.env.ACCESS_TOKEN_SECRET,
       },
