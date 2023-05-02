@@ -72,7 +72,7 @@ const impl = async (app) => {
 
   app.get('/launchpad', isNotAuthorized, (req, res, next) => {
     const user = req.user;
-    return res.render('launchpad.ejs', { username: user.username });
+    return res.render('launchpad.ejs', { username: user.username, role: user.role });
   });
 
   app.get('/error', (req, res, next) => {
