@@ -40,15 +40,13 @@ const impl = async (app) => {
   // set static folder
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
-  // include routes
   const isAuthorized = (req, res, next) => {
     passport.authenticate('jwt', (err, user, info) => {
       if (user) {
         req.user = user;
-        res.redirect('/launchpad');
-      } else {
-        next();
+        return res.redirect('/launchpad');
       }
+      return next();
     })(req, res, next);
   };
 
@@ -56,16 +54,16 @@ const impl = async (app) => {
     passport.authenticate('jwt', (err, user, info) => {
       if (user) {
         req.user = user;
-        next();
-      } else {
-        // This was the only way i found to change the default err message of JwtStrategy
-        info.message = info.message ? info.message : 'Unkown error';
-        info.message = info.message === 'No auth token' ? 'Forbidden Access' : info.message;
-        res.redirect(`/error?message=${encodeURIComponent(info.message)}`);
+        return next();
       }
+      // const errorMessage = info.message || 'Unknown error';
+      // This was the only way i found to change the default err message of JwtStrategy
+      const errorMessage = info.message === 'No auth token' ? 'Forbidden Access' : info.message;
+      return res.redirect(`/error?message=${encodeURIComponent(errorMessage)}`);
     })(req, res, next);
   };
 
+  // include routes
   app.get('/', (req, res, next) => {
     return res.redirect('/login');
   });
@@ -82,17 +80,17 @@ const impl = async (app) => {
 
   app.post('/logout', (req, res) => {
     res.clearCookie('jwt');
-    res.redirect('/login');
+    return res.redirect('/login');
   });
 
   app.get('/register', isAuthorized, (req, res) => {
     const message = req.query.message ? decodeURIComponent(req.query.message) : null;
-    res.render('register.ejs', { error: message });
+    return res.render('register.ejs', { error: message });
   });
 
   app.get('/login', isAuthorized, (req, res) => {
     const message = req.query.message ? decodeURIComponent(req.query.message) : null;
-    res.render('login.ejs', { error: message });
+    return res.render('login.ejs', { error: message });
   });
 
   app.post('/login', (req, res, next) => {
@@ -102,16 +100,18 @@ const impl = async (app) => {
         const message = info ? info.message : 'Login failed';
         return res.redirect(`/login?message=${encodeURIComponent(message)}`);
       }
-      // This creates a session for the user
+      /* This triggers passport to create an user session object, it won't be used, but it's needed for the JWT strategy to work */
       req.login(user, { session: false }, async (err) => {
         if (err) {
-          res.send(err);
+          return res.send(err);
         }
+        /* The client is created before the try block so it can be used in the finally block (if an error occurs no one will catch it here) */
         const client = await pool.connect();
         try {
           // Generate and return JWT token
-          const userID = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
-          const token = jwt.sign({ user: userID.rows[0] }, process.env.ACCESS_TOKEN_SECRET);
+          const result = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
+          const userID = result.rows[0];
+          const token = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET);
           res.cookie('jwt', token, {
             httpOnly: true,
             // secure: true, // Uncomment this on production
@@ -128,8 +128,12 @@ const impl = async (app) => {
   });
 
   app.post('/register', async (req, res, next) => {
+    /* The client is created before the try block so it can be used in the finally block (if an error occurs no one will catch it here) */
     const client = await pool.connect();
     try {
+      const { username, email, role, workstation, password } = req.body;
+
+      // Check if user already exists
       const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [
         req.body.email,
       ]);
@@ -137,18 +141,20 @@ const impl = async (app) => {
         const message = 'Email already exists';
         return res.redirect(`/register?message=${encodeURIComponent(message)}`);
       }
-      const username = req.body.name;
-      const email = req.body.email;
-      const role = req.body.role;
-      const workstation = req.body.workstation;
-      const password = await bcrypt.hash(req.body.password, 10);
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       // Save user to database
-      const userID = await client.query(
+      const result = await client.query(
         'INSERT INTO users (username, email, password, role, workstation) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-        [username, email, password, role, workstation]
+        [username, email, hashedPassword, role, workstation]
       );
+      // Get user ID
+      const userID = result.rows[0];
+
       // Generate and return JWT token
-      const token = jwt.sign({ user: userID.rows[0] }, process.env.ACCESS_TOKEN_SECRET);
+      const token = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET);
       res.cookie('jwt', token, {
         httpOnly: true,
         // secure: true, // Uncomment this on production

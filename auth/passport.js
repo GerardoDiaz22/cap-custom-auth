@@ -42,7 +42,7 @@ module.exports = function (passport) {
             message: 'Logged in Successfully',
           });
         } catch (error) {
-          return done(error);
+          return done(error, false, { message: 'Internal server error' });
         } finally {
           client.release();
         }
@@ -74,7 +74,7 @@ module.exports = function (passport) {
             return done(null, false, { message: 'User not found' });
           }
         } catch (error) {
-          return done(error, false);
+          return done(error, false, { message: 'Internal server error' });
         } finally {
           client.release();
         }
