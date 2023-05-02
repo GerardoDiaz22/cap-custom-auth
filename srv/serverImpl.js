@@ -162,6 +162,39 @@ const impl = async (app) => {
     }
   });
 
+  app.get('/workstations', isNotAuthorized, async (req, res, next) => {
+    const workstationHub = [
+      {
+        ID: '1',
+        sociedades: ['1001'],
+        centros: ['1001'],
+        oficinas: ['1001'],
+      },
+      {
+        ID: '2',
+        sociedades: ['1002'],
+        centros: ['1002'],
+        oficinas: ['1002'],
+      },
+      {
+        ID: '3',
+        sociedades: ['1003'],
+        centros: ['1001'],
+        oficinas: ['1004'],
+      },
+      {
+        ID: '4',
+        sociedades: ['1004'],
+        centros: ['1003'],
+        oficinas: ['1006'],
+      },
+    ];
+    if (req.query?.ID) {
+      return res.json(workstationHub.filter((workstation) => workstation.ID === req.query.ID));
+    }
+    return res.json(workstationHub);
+  });
+
   // This is a catch-all route that check if the user is authorized
   // Probably going to use app.use for this later...
   app.use('*', isNotAuthorized, (req, res, next) => next());

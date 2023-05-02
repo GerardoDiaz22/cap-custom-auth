@@ -1,56 +1,35 @@
 const cds = require('@sap/cds');
+const { default: axios } = require('axios');
 
-// the workstation id is the same as the array index + 1 for the sake of simplicity
-const workstationHub = [
-  {
-    id: 1,
-    sociedades: ['1001', '1002'],
-    centros: ['1001', '1002', '1003'],
-    oficinas: ['1001', '1002', '1003', '1004'],
-  },
-  {
-    id: 2,
-    sociedades: ['1001', '1003'],
-    centros: ['1001', '1003', '1004'],
-    oficinas: ['1001', '1004'],
-  },
-  {
-    id: 3,
-    sociedades: ['1002', '1003'],
-    centros: ['1001', '1003', '1004'],
-    oficinas: ['1002', '1003', '1004'],
-  },
-  {
-    id: 4,
-    sociedades: ['1002', '1004'],
-    centros: ['1002', '1003', '1004'],
-    oficinas: ['1001', '1003', '1004'],
-  },
-  {
-    id: 5,
-    sociedades: ['1001', '1004'],
-    centros: ['1001', '1002', '1003'],
-    oficinas: ['1002', '1003', '1004'],
-  },
-  {
-    id: 6,
-    sociedades: ['1001', '1002', '1003', '1004'],
-    centros: ['1001', '1002', '1003', '1004'],
-    oficinas: ['1001', '1002', '1003', '1004'],
-  },
-];
+module.exports = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).send('Unauthorized');
+    }
+    // Get workstation data from SAP Workspaces (local endpoint for now)
+    const { ID, ...workstation } = await axios
+      .get(`http://localhost:4004/workstations?ID=${req.user.workstation}`, {
+        headers: {
+          Authorization: `Bearer ${req.cookies.jwt}`, // Using the cookie this way is bad, but it's a symptom of not separing the auth from the app yet
+        },
+      })
+      .then((res) => res.data[0]);
 
-module.exports = (req, res, next) => {
-  if (req?.user) {
+    if (!workstation) {
+      return res.status(401).send('Workstation not found');
+    }
+
+    // Fulfill the req.user contract for CDS
     req.user = new cds.User({
       id: req.user.id,
       roles: [req.user.role],
-      attr: workstationHub[req.user.workstation - 1], // This would be a request to SAP Workspaces?
+      attr: workstation,
     });
-    // req.tenant is for different companies
+    // req.tenant is for different companies (running a multitenant environment)
+
     next();
-  } else {
-    console.log('Error', req.user);
-    res.status(401).send();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
   }
 };
