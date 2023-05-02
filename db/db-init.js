@@ -1,12 +1,13 @@
+require('dotenv').config();
 const { Client } = require('pg');
 
 (async () => {
   const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'postgres',
-    password: 'www',
-    port: '5432',
+    user: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
+    database: process.env.POSTGRES_DB,
+    host: process.env.POSTGRES_HOST,
+    port: process.env.POSTGRES_PORT,
   });
 
   try {
@@ -19,11 +20,11 @@ const { Client } = require('pg');
     }
     // Create a new client instance connected to the users_db database
     const usersClient = new Client({
-      user: 'postgres',
-      host: 'localhost',
-      database: 'users_db',
-      password: 'www',
-      port: '5432',
+      user: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_USERS_DB,
+      host: process.env.POSTGRES_HOST,
+      port: process.env.POSTGRES_PORT,
     });
 
     await usersClient.connect();

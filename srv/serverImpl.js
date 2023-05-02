@@ -8,11 +8,11 @@ const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'users_db',
-  password: 'www',
-  port: '5432',
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_USERS_DB,
+  host: process.env.POSTGRES_HOST,
+  port: process.env.POSTGRES_PORT,
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
