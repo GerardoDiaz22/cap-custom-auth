@@ -106,9 +106,18 @@ const impl = async (app) => {
     return res.render('error.ejs', { error: message });
   });
 
-  app.post('/logout', (req, res) => {
-    res.clearCookie('jwt');
-    return res.redirect('/login');
+  app.post('/logout', async (req, res) => {
+    const client = await pool.connect();
+    try {
+      res.clearCookie('jwt');
+      res.clearCookie('refreshJwt');
+      await client.query('DELETE FROM refresh_tokens WHERE token = $1', [req.cookies.refreshJwt]);
+      return res.redirect('/login');
+    } catch (err) {
+      return res.redirect(`/error?message=${encodeURIComponent(err)}`);
+    } finally {
+      client.release();
+    }
   });
 
   app.get('/register', isAuthorized, (req, res) => {
