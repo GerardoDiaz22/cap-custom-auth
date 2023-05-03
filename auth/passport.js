@@ -65,11 +65,58 @@ module.exports = function (passport) {
         // jwt_payload is the token payload
         const client = await pool.connect();
         try {
+          // Get the user from the database
           const user = await client.query('SELECT * FROM users WHERE id = $1', [
             jwt_payload.user.id,
           ]);
+          // Check if the user exists
           if (user.rowCount) {
-            return done(null, user.rows[0]);
+            return done(null, { user: user.rows[0], flag: false });
+          } else {
+            return done(null, false, { message: 'User not found' });
+          }
+        } catch (error) {
+          return done(error, false, { message: 'Internal server error' });
+        } finally {
+          client.release();
+        }
+      }
+    )
+  );
+
+  passport.use(
+    'refreshJWT',
+    new JwtStrategy(
+      {
+        jwtFromRequest: ExtractJwt.fromExtractors([
+          (req) => req.cookies.refreshJwt || null,
+          // ExtractJwt.fromCookie('refreshJwt')
+          ExtractJwt.fromAuthHeaderAsBearerToken(),
+        ]),
+        secretOrKey: process.env.REFRESH_TOKEN_SECRET,
+        passReqToCallback: true,
+      },
+      async (req, jwt_payload, done) => {
+        // jwt_payload is the token payload
+        console.log('REFRESH');
+        const client = await pool.connect();
+        try {
+          // Check if the refresh token is in the database
+          const validate = await client.query('SELECT * FROM refresh_tokens WHERE token = $1', [
+            req.cookies.jwtRefresh,
+          ]);
+          if (!validate.rowCount) {
+            return done(null, false, { message: 'Invalid token' });
+          }
+
+          // Get the user from the database
+          const user = await client.query('SELECT * FROM users WHERE id = $1', [
+            jwt_payload.user.id,
+          ]);
+
+          // Check if the user exists
+          if (user.rowCount) {
+            return done(null, { user: user.rows[0], flag: true });
           } else {
             return done(null, false, { message: 'User not found' });
           }

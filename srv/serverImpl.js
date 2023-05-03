@@ -41,9 +41,23 @@ const impl = async (app) => {
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
   const isAuthorized = (req, res, next) => {
-    passport.authenticate('jwt', (err, user, info) => {
-      if (user) {
-        req.user = user;
+    passport.authenticate(['jwt', 'refreshJWT'], (err, payload, info) => {
+      if (payload) {
+        req.user = payload.user;
+        if (payload.flag) {
+          console.log({ user: { id: payload.user.id } });
+          const accessToken = jwt.sign(
+            { user: { id: payload.user.id } },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+              expiresIn: '5min',
+            }
+          );
+          res.cookie('jwt', accessToken, {
+            httpOnly: true,
+            // secure: true, // Uncomment this on production
+          });
+        }
         return res.redirect('/launchpad');
       }
       return next();
@@ -51,9 +65,23 @@ const impl = async (app) => {
   };
 
   const isNotAuthorized = (req, res, next) => {
-    passport.authenticate('jwt', (err, user, info) => {
-      if (user) {
-        req.user = user;
+    passport.authenticate(['jwt', 'refreshJWT'], (err, payload, info) => {
+      if (payload) {
+        req.user = payload.user;
+        if (payload.flag) {
+          console.log({ user: { id: payload.user.id } });
+          const accessToken = jwt.sign(
+            { user: { id: payload.user.id } },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+              expiresIn: '5min',
+            }
+          );
+          res.cookie('jwt', accessToken, {
+            httpOnly: true,
+            // secure: true, // Uncomment this on production
+          });
+        }
         return next();
       }
       // const errorMessage = info.message || 'Unknown error';
@@ -108,14 +136,28 @@ const impl = async (app) => {
         /* The client is created before the try block so it can be used in the finally block (if an error occurs no one will catch it here) */
         const client = await pool.connect();
         try {
-          // Generate and return JWT token
+          // Get user from database
           const result = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
+          // Get user ID
           const userID = result.rows[0];
-          const token = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET);
-          res.cookie('jwt', token, {
+
+          // Generate access token
+          const accessToken = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: '5min',
+          });
+          res.cookie('jwt', accessToken, {
             httpOnly: true,
             // secure: true, // Uncomment this on production
           });
+
+          // Generate refresh token
+          const refreshToken = jwt.sign({ user: userID }, process.env.REFRESH_TOKEN_SECRET);
+          await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
+          res.cookie('refreshJwt', refreshToken, {
+            httpOnly: true,
+            // secure: true, // Uncomment this on production
+          });
+
           // return res.json({ token });
           return res.redirect('/launchpad');
         } catch (err) {
@@ -153,12 +195,23 @@ const impl = async (app) => {
       // Get user ID
       const userID = result.rows[0];
 
-      // Generate and return JWT token
-      const token = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET);
-      res.cookie('jwt', token, {
+      // Generate access token
+      const accessToken = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: '5min',
+      });
+      res.cookie('jwt', accessToken, {
         httpOnly: true,
         // secure: true, // Uncomment this on production
       });
+
+      // Generate refresh token
+      const refreshToken = jwt.sign({ user: userID }, process.env.REFRESH_TOKEN_SECRET);
+      await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
+      res.cookie('refreshJwt', refreshToken, {
+        httpOnly: true,
+        // secure: true, // Uncomment this on production
+      });
+
       // return res.json({ token });
       return res.redirect('/login');
     } catch (err) {

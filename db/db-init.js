@@ -38,10 +38,14 @@ const { Client } = require('pg');
         password VARCHAR(255) NOT NULL,
         role VARCHAR(255) NOT NULL,
         workstation INTEGER NOT NULL
-      )
+      );
+      CREATE TABLE IF NOT EXISTS refresh_tokens (
+        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        token VARCHAR(255) NOT NULL
+      );
     `);
     await usersClient.end();
-    console.log('Database and table created successfully');
+    console.log('Database and tables created successfully');
   } catch (err) {
     console.error(err);
   } finally {
