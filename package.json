@@ -9,6 +9,8 @@
     "@sap/cds": "^6",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
+    "cds-dbm": "^0.1.4",
+    "cds-pg": "^0.1.36",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.9",
@@ -26,9 +28,10 @@
   },
   "scripts": {
     "start": "cds run",
-    "db-init": "node ./db/db-init.js",
-    "watch-products-worklist": "cds watch --open products-worklist/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-sales": "cds watch --open sales/webapp/index.html?sap-ui-xx-viewCache=false"
+    "deploy:auth": "node ./db/db-init.js",
+    "deploy:pg": "npx cds-dbm deploy --create-db --load-via delta",
+    "deploy:pg:clean": "npx cds-dbm deploy --create-db --auto-undeploy --load-via full",
+    "load:pg": "npx cds-dbm load --via delta"
   },
   "engines": {
     "node": "^16.15"
@@ -66,6 +69,29 @@
     "requires": {
       "auth": {
         "impl": "./auth/handler.js"
+      },
+      "db": {
+        "kind": "postgres"
+      },
+      "postgres": {
+        "impl": "cds-pg",
+        "dialect": "plain",
+        "model": [
+          "srv"
+        ]
+      }
+    },
+    "migrations": {
+      "db": {
+        "schema": {
+          "default": "public",
+          "clone": "_cdsdbm_clone",
+          "reference": "_cdsdbm_ref"
+        },
+        "deploy": {
+          "tmpFile": "tmp/_autodeploy.json",
+          "undeployFile": "db/undeploy.json"
+        }
       }
     }
   }
