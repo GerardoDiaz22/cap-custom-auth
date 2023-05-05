@@ -1,25 +1,45 @@
-# Getting Started
+## Commands
 
-Welcome to your new project.
+- `npm install`
+- `npm run deploy:pg:clean`
+- `npm run deploy:auth`
+- `cds serve`
 
-It contains these folders and files, following our recommended project layout:
+## Setup
 
-File or Folder | Purpose
----------|----------
-`app/` | content for UI frontends goes here
-`db/` | your domain models and data go here
-`srv/` | your service models and code go here
-`package.json` | project metadata and configuration
-`readme.md` | this getting started guide
+- Create a default-env.json file in the root of the project and insert the following content:
 
+```
+{
+  "VCAP_SERVICES": {
+    "postgres": [
+      {
+        "name": "postgres",
+        "label": "postgres",
+        "tags": ["postgres", "database", "plain"],
+        "credentials": {
+          "host": "localhost",
+          "port": 5432,
+          "database": "cds_db",
+          "user": "postgres",
+          "password": "{your_password}",
+          "schema": "public"
+        }
+      }
+    ]
+  }
+}
+```
 
-## Next Steps
+- Change your password in the .env file:
 
-- Open a new terminal and run `cds watch` 
-- (in VS Code simply choose _**Terminal** > Run Task > cds watch_)
-- Start adding content, for example, a [db/schema.cds](db/schema.cds).
-
-
-## Learn More
-
-Learn more at https://cap.cloud.sap/docs/get-started/.
+```
+ACCESS_TOKEN_SECRET=f69fb335ae6244c39b870620765875722ec0574310e5f1757392e03795d164de
+REFRESH_TOKEN_SECRET=abdf84a039985de07c5d45030fed97493e18b7721764b590b8eb514aa2ba27fb
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=www
+POSTGRES_DB={your_password}
+POSTGRES_USERS_DB=users_db
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+```
