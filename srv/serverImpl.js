@@ -42,12 +42,14 @@ const impl = async (app) => {
 
   const generateAccessToken = (user) => {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: process.env.EXPIRE_TIME_TOKEN,
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
     });
   };
 
   const generateRefreshToken = (user) => {
-    return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+    return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
+    });
   };
 
   const requireAuthentication = (returnToLaunchpad) => (req, res, next) => {
