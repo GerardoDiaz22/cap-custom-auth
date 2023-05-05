@@ -22,8 +22,7 @@
           "port": 5432,
           "database": "cds_db",
           "user": "postgres",
-          "password": "{your_password}",
-          "schema": "public"
+          "password": "{your_password}"
         }
       }
     ]
