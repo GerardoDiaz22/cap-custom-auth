@@ -98,12 +98,11 @@ module.exports = function (passport) {
       },
       async (req, jwt_payload, done) => {
         // jwt_payload is the token payload
-        console.log('REFRESH');
         const client = await pool.connect();
         try {
           // Check if the refresh token is in the database
           const validate = await client.query('SELECT * FROM refresh_tokens WHERE token = $1', [
-            req.cookies.jwtRefresh,
+            req.cookies.refreshJwt,
           ]);
           if (!validate.rowCount) {
             return done(null, false, { message: 'Invalid token' });

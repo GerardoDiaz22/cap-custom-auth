@@ -45,12 +45,11 @@ const impl = async (app) => {
       if (payload) {
         req.user = payload.user;
         if (payload.flag) {
-          console.log({ user: { id: payload.user.id } });
           const accessToken = jwt.sign(
             { user: { id: payload.user.id } },
             process.env.ACCESS_TOKEN_SECRET,
             {
-              expiresIn: '5min',
+              expiresIn: process.env.EXPIRE_TIME_TOKEN,
             }
           );
           res.cookie('jwt', accessToken, {
@@ -69,12 +68,11 @@ const impl = async (app) => {
       if (payload) {
         req.user = payload.user;
         if (payload.flag) {
-          console.log({ user: { id: payload.user.id } });
           const accessToken = jwt.sign(
             { user: { id: payload.user.id } },
             process.env.ACCESS_TOKEN_SECRET,
             {
-              expiresIn: '5min',
+              expiresIn: process.env.EXPIRE_TIME_TOKEN,
             }
           );
           res.cookie('jwt', accessToken, {
@@ -152,7 +150,7 @@ const impl = async (app) => {
 
           // Generate access token
           const accessToken = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: '5min',
+            expiresIn: process.env.EXPIRE_TIME_TOKEN,
           });
           res.cookie('jwt', accessToken, {
             httpOnly: true,
@@ -206,7 +204,7 @@ const impl = async (app) => {
 
       // Generate access token
       const accessToken = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '5min',
+        expiresIn: process.env.EXPIRE_TIME_TOKEN,
       });
       res.cookie('jwt', accessToken, {
         httpOnly: true,
