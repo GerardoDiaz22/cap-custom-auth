@@ -40,63 +40,46 @@ const impl = async (app) => {
   // set static folder
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
-  const isAuthorized = (req, res, next) => {
+  const generateAccessToken = (user) => {
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: process.env.EXPIRE_TIME_TOKEN,
+    });
+  };
+
+  const generateRefreshToken = (user) => {
+    return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+  };
+
+  const requireAuthentication = (returnToLaunchpad) => (req, res, next) => {
     passport.authenticate(['jwt', 'refreshJWT'], (err, payload, info) => {
-      if (payload) {
-        req.user = payload.user;
-        if (payload.flag) {
-          const accessToken = jwt.sign(
-            { user: { id: payload.user.id } },
-            process.env.ACCESS_TOKEN_SECRET,
-            {
-              expiresIn: process.env.EXPIRE_TIME_TOKEN,
-            }
-          );
-          res.cookie('jwt', accessToken, {
-            httpOnly: true,
-            // secure: true, // Uncomment this on production
-          });
+      if (err || !payload) {
+        if (!returnToLaunchpad) {
+          const errorMessage = info.message || 'Invalid Token';
+          return res.redirect(`/error?message=${encodeURIComponent(errorMessage)}`);
         }
+        return next();
+      }
+
+      req.user = payload.user;
+
+      if (payload.flag) {
+        const accessToken = generateAccessToken({ user: { id: payload.user.id } });
+        res.cookie('jwt', accessToken, {
+          httpOnly: true,
+          // secure: true, Uncomment this on production
+        });
+      }
+
+      if (returnToLaunchpad) {
         return res.redirect('/launchpad');
       }
       return next();
     })(req, res, next);
   };
 
-  const isNotAuthorized = (req, res, next) => {
-    passport.authenticate(['jwt', 'refreshJWT'], (err, payload, info) => {
-      if (payload) {
-        req.user = payload.user;
-        if (payload.flag) {
-          const accessToken = jwt.sign(
-            { user: { id: payload.user.id } },
-            process.env.ACCESS_TOKEN_SECRET,
-            {
-              expiresIn: process.env.EXPIRE_TIME_TOKEN,
-            }
-          );
-          res.cookie('jwt', accessToken, {
-            httpOnly: true,
-            // secure: true, // Uncomment this on production
-          });
-        }
-        return next();
-      }
-      // const errorMessage = info.message || 'Unknown error';
-      // This was the only way i found to change the default err message of JwtStrategy
-      const errorMessage = info.message === 'No auth token' ? 'Forbidden Access' : info.message;
-      return res.redirect(`/error?message=${encodeURIComponent(errorMessage)}`);
-    })(req, res, next);
-  };
-
   // include routes
   app.get('/', (req, res, next) => {
     return res.redirect('/login');
-  });
-
-  app.get('/launchpad', isNotAuthorized, (req, res, next) => {
-    const user = req.user;
-    return res.render('launchpad.ejs', { username: user.username, role: user.role });
   });
 
   app.get('/error', (req, res, next) => {
@@ -118,12 +101,12 @@ const impl = async (app) => {
     }
   });
 
-  app.get('/register', isAuthorized, (req, res) => {
+  app.get('/register', requireAuthentication(true), (req, res) => {
     const message = req.query.message ? decodeURIComponent(req.query.message) : null;
     return res.render('register.ejs', { error: message });
   });
 
-  app.get('/login', isAuthorized, (req, res) => {
+  app.get('/login', requireAuthentication(true), (req, res) => {
     const message = req.query.message ? decodeURIComponent(req.query.message) : null;
     return res.render('login.ejs', { error: message });
   });
@@ -149,16 +132,14 @@ const impl = async (app) => {
           const userID = result.rows[0];
 
           // Generate access token
-          const accessToken = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: process.env.EXPIRE_TIME_TOKEN,
-          });
+          const accessToken = generateAccessToken({ user: userID });
           res.cookie('jwt', accessToken, {
             httpOnly: true,
             // secure: true, // Uncomment this on production
           });
 
           // Generate refresh token
-          const refreshToken = jwt.sign({ user: userID }, process.env.REFRESH_TOKEN_SECRET);
+          const refreshToken = generateRefreshToken({ user: userID });
           await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
           res.cookie('refreshJwt', refreshToken, {
             httpOnly: true,
@@ -203,16 +184,14 @@ const impl = async (app) => {
       const userID = result.rows[0];
 
       // Generate access token
-      const accessToken = jwt.sign({ user: userID }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: process.env.EXPIRE_TIME_TOKEN,
-      });
+      const accessToken = generateAccessToken({ user: userID });
       res.cookie('jwt', accessToken, {
         httpOnly: true,
         // secure: true, // Uncomment this on production
       });
 
       // Generate refresh token
-      const refreshToken = jwt.sign({ user: userID }, process.env.REFRESH_TOKEN_SECRET);
+      const refreshToken = generateRefreshToken({ user: userID });
       await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
       res.cookie('refreshJwt', refreshToken, {
         httpOnly: true,
@@ -228,7 +207,14 @@ const impl = async (app) => {
     }
   });
 
-  app.get('/workstations', isNotAuthorized, async (req, res, next) => {
+  app.use(requireAuthentication(false));
+
+  app.get('/launchpad', (req, res, next) => {
+    const user = req.user;
+    return res.render('launchpad.ejs', { username: user.username, role: user.role });
+  });
+
+  app.get('/workstations', async (req, res, next) => {
     const workstationHub = [
       {
         ID: '1',
@@ -260,10 +246,6 @@ const impl = async (app) => {
     }
     return res.json(workstationHub);
   });
-
-  // This is a catch-all route that check if the user is authorized
-  // Probably going to use app.use for this later...
-  app.use('*', isNotAuthorized, (req, res, next) => next());
 };
 
 module.exports = { impl };
