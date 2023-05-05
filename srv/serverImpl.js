@@ -80,10 +80,6 @@ const impl = async (app) => {
   };
 
   // include routes
-  app.get('/', (req, res, next) => {
-    return res.redirect('/login');
-  });
-
   app.get('/error', (req, res, next) => {
     const message = req.query.message ? decodeURIComponent(req.query.message) : null;
     return res.render('error.ejs', { error: message });
