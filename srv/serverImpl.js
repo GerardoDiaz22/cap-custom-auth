@@ -113,6 +113,47 @@ const impl = async (app) => {
     return res.render('login.ejs', { error: message });
   });
 
+  app.post('/api/login', (req, res, next) => {
+    passport.authenticate('login', { session: false }, (err, user, info) => {
+      if (err) {
+        const message = info.message || 'Unexpected error';
+        return res.status(500).json({ error: message });
+      }
+
+      if (!user) {
+        const message = info.message || 'Login failed';
+        return res.status(401).json({ error: message });
+      }
+
+      req.login(user, { session: false }, async (err) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+
+        const client = await pool.connect();
+        try {
+          // Get user from database
+          const result = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
+          // Get user ID
+          const userID = result.rows[0];
+
+          // Generate access token
+          const accessToken = generateAccessToken({ user: userID });
+
+          // Generate refresh token
+          const refreshToken = generateRefreshToken({ user: userID });
+          await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
+
+          return res.status(201).json({ accessToken, refreshToken });
+        } catch (err) {
+          return res.status(500).json({ error: err });
+        } finally {
+          client.release();
+        }
+      });
+    })(req, res, next);
+  });
+
   app.post('/login', (req, res, next) => {
     // This call the local strategy first
     passport.authenticate('login', { session: false }, (err, user, info) => {
@@ -157,6 +198,46 @@ const impl = async (app) => {
         }
       });
     })(req, res, next);
+  });
+
+  app.post('/api/register', async (req, res, next) => {
+    const client = await pool.connect();
+    try {
+      const { username, email, role, workstation, password } = req.body;
+
+      // Check if user already exists
+      const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [
+        req.body.email,
+      ]);
+      if (existingUser.rowCount) {
+        const message = 'Email already exists';
+        return res.status(409).json({ error: message });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Save user to database
+      const result = await client.query(
+        'INSERT INTO users (username, email, password, role, workstation) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+        [username, email, hashedPassword, role, workstation]
+      );
+      // Get user ID
+      const userID = result.rows[0];
+
+      // Generate access token
+      const accessToken = generateAccessToken({ user: userID });
+
+      // Generate refresh token
+      const refreshToken = generateRefreshToken({ user: userID });
+      await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
+
+      return res.status(201).json({ accessToken, refreshToken });
+    } catch (err) {
+      return res.status(500).json({ error: err });
+    } finally {
+      client.release();
+    }
   });
 
   app.post('/register', async (req, res, next) => {
@@ -207,6 +288,17 @@ const impl = async (app) => {
     } finally {
       client.release();
     }
+  });
+
+  app.post('/api/token', async (req, res, next) => {
+    passport.authenticate(['refreshJWT'], (err, payload, info) => {
+      if (err || !payload) {
+        const message = info.message || 'Invalid Token';
+        return res.status(401).json({ error: message });
+      }
+      const accessToken = generateAccessToken({ user: { id: payload.user.id } });
+      return res.status(201).json({ accessToken });
+    })(req, res, next);
   });
 
   app.use(requireAuthentication(false));
