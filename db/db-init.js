@@ -41,7 +41,7 @@ const { Client } = require('pg');
       );
       CREATE TABLE IF NOT EXISTS refresh_tokens (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-        token VARCHAR(255) NOT NULL
+        token TEXT NOT NULL
       );
     `);
     await usersClient.end();
