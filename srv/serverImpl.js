@@ -52,37 +52,55 @@ const impl = async (app) => {
     });
   };
 
-  const requireAuthentication = (returnToLaunchpad) => (req, res, next) => {
-    passport.authenticate(['jwt', 'refreshJWT'], (err, payload, info) => {
-      if (err || !payload) {
-        if (!returnToLaunchpad) {
-          const errorMessage = info.message || 'Invalid Token';
+  const requireAuthentication =
+    ({ goToLoginOnUnauth = false, goToHomeOnAuth = false } = {}) =>
+    (req, res, next) => {
+      passport.authenticate(['jwt', 'refreshJWT'], (err, payload, info) => {
+        if (err || !payload) {
+          // Go to login page if unauthenticated
+          if (goToLoginOnUnauth) {
+            return res.redirect('/authentication/webapp/index.html');
+          }
+          // If already on login page, go to next middleware FIXME: There should be a cleaner way to do this
+          if (req.originalUrl.startsWith('/authentication/webapp/')) {
+            return next();
+          }
+          // Go to error page
+          const errorMessage = info?.message || 'Invalid Token';
           return res.redirect(`/error?message=${encodeURIComponent(errorMessage)}`);
         }
+
+        // Set user in request
+        req.user = payload.user;
+
+        // Set new access token if refresh token is valid
+        if (payload.flag) {
+          const accessToken = generateAccessToken({ user: { id: payload.user.id } });
+          res.cookie('jwt', accessToken, {
+            httpOnly: true,
+            // secure: true, Uncomment this on production
+          });
+        }
+
+        // Go to home page if authenticated
+        if (goToHomeOnAuth) {
+          return res.redirect('/');
+        }
+        // Go to next middleware
         return next();
-      }
+      })(req, res, next);
+    };
 
-      req.user = payload.user;
-
-      if (payload.flag) {
-        const accessToken = generateAccessToken({ user: { id: payload.user.id } });
-        res.cookie('jwt', accessToken, {
-          httpOnly: true,
-          // secure: true, Uncomment this on production
-        });
-      }
-
-      if (returnToLaunchpad) {
-        return res.redirect('/launchpad');
-      }
-      return next();
-    })(req, res, next);
+  const logRequest = (req, res, next) => {
+    console.log(req.method, '-', req.url);
+    next();
   };
+  app.use(logRequest);
 
-  // include routes
+  /* Always Unprotected */
   app.get('/error', (req, res, next) => {
     const message = req.query.message ? decodeURIComponent(req.query.message) : null;
-    return res.render('error.ejs', { error: message });
+    return res.render('error.ejs', { error: message }); // TODO: should i do this page in sapui5?
   });
 
   app.post('/logout', async (req, res) => {
@@ -90,6 +108,7 @@ const impl = async (app) => {
     try {
       res.clearCookie('jwt');
       res.clearCookie('refreshJwt');
+      console.log('Here!', req.cookies.refreshJwt);
       await client.query('DELETE FROM refresh_tokens WHERE token = $1', [req.cookies.refreshJwt]);
       return res.redirect('/login');
     } catch (err) {
@@ -99,26 +118,23 @@ const impl = async (app) => {
     }
   });
 
-  app.get('/register', requireAuthentication(true), (req, res) => {
-    const message = req.query.message ? decodeURIComponent(req.query.message) : null;
-    return res.render('register.ejs', { error: message });
-  });
+  /* Only Unauthenticated -> redirects to Home */
+  app.get('/authentication/webapp/*', requireAuthentication({ goToHomeOnAuth: true }));
 
-  app.get('/login', requireAuthentication(true), (req, res) => {
-    const message = req.query.message ? decodeURIComponent(req.query.message) : null;
-    return res.render('login.ejs', { error: message });
-  });
+  /* Only Authenticated -> redirects to Login */
+  app.get('/', requireAuthentication({ goToLoginOnUnauth: true }));
 
+  /* Always Protected */
   app.post('/api/login', (req, res, next) => {
     passport.authenticate('login', { session: false }, (err, user, info) => {
       if (err) {
         const message = info.message || 'Unexpected error';
-        return res.status(500).json({ error: message });
+        return res.status(500).json({ message });
       }
 
       if (!user) {
         const message = info.message || 'Login failed';
-        return res.status(401).json({ error: message });
+        return res.status(401).json({ message });
       }
 
       req.login(user, { session: false }, async (err) => {
@@ -137,12 +153,13 @@ const impl = async (app) => {
           const accessToken = generateAccessToken({ user: userID });
 
           // Generate refresh token
-          const refreshToken = generateRefreshToken({ user: userID });
+          const refreshToken = generateRefreshToken({ user: userID }); // TODO: hash refrshtokens?
           await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
 
-          return res.status(201).json({ accessToken, refreshToken });
+          const message = info.message || 'Logged in Successful'; // TODO: think how to better handle this messages
+          return res.status(201).json({ message, accessToken, refreshToken });
         } catch (err) {
-          return res.status(500).json({ error: err });
+          return res.status(500).json({ message: err });
         } finally {
           client.release();
         }
@@ -202,12 +219,10 @@ const impl = async (app) => {
       const { username, email, role, workstation, password } = req.body;
 
       // Check if user already exists
-      const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [
-        req.body.email,
-      ]);
+      const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
       if (existingUser.rowCount) {
         const message = 'Email already exists';
-        return res.status(409).json({ error: message });
+        return res.status(409).json({ message });
       }
 
       // Hash password
@@ -227,10 +242,10 @@ const impl = async (app) => {
       // Generate refresh token
       const refreshToken = generateRefreshToken({ user: userID });
       await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
-
-      return res.status(201).json({ accessToken, refreshToken });
+      const message = 'Signup Successful';
+      return res.status(201).json({ accessToken, refreshToken, message });
     } catch (err) {
-      return res.status(500).json({ error: err });
+      return res.status(500).json({ message: err });
     } finally {
       client.release();
     }
@@ -290,14 +305,15 @@ const impl = async (app) => {
     passport.authenticate(['refreshJWT'], (err, payload, info) => {
       if (err || !payload) {
         const message = info.message || 'Invalid Token';
-        return res.status(401).json({ error: message });
+        return res.status(401).json({ message });
       }
       const accessToken = generateAccessToken({ user: { id: payload.user.id } });
+      const message = info.message || 'Refresh Token Created Successfully'; // TODO: Not sure about this message
       return res.status(201).json({ accessToken });
     })(req, res, next);
   });
 
-  app.use(requireAuthentication(false));
+  app.use(requireAuthentication());
 
   app.get('/launchpad', (req, res, next) => {
     const user = req.user;
