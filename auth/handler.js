@@ -10,7 +10,7 @@ module.exports = async (req, res, next) => {
     const { ID, ...workstation } = await axios
       .get(`http://localhost:4004/workstations?ID=${req.user.workstation}`, {
         headers: {
-          Authorization: `Bearer ${req.cookies.jwt}`, // Using the cookie this way is bad, but it's a symptom of not separing the auth from the app yet
+          Authorization: `Bearer ${req.cookies.jwtAccessToken}`, // FIXME: This weird auth header is just for this demo
         },
       })
       .then((res) => res.data[0]);
@@ -22,6 +22,7 @@ module.exports = async (req, res, next) => {
     // Fulfill the req.user contract for CDS
     req.user = new cds.User({
       id: req.user.id,
+      username: req.user.username,
       roles: [req.user.role],
       attr: workstation,
     });
