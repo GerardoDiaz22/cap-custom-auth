@@ -64,7 +64,8 @@
   "sapux": [
     "app/products-worklist",
     "app/sales",
-    "app/authentication"
+    "app/authentication",
+    "app/home"
   ],
   "cds": {
     "requires": {

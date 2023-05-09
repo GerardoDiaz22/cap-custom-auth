@@ -1,0 +1,14 @@
+<mvc:View controllerName="home.home.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}" showHeader="false">
+        <content>
+            <FlexBox id="homeLayout" height="100%" alignItems="Center" justifyContent="Center">
+                <Panel id="homePanel" class="shadow" width="600px" height="300px">
+                    <Label id="userHeader" text="Welcome, {>Products('4fd0e8fa-8709-48d9-9b02-2758b4711c76')>name} (Admin)" />
+                    <Button id="homeBtnLogout" text="Logout" press="onLogoutPress" />
+                </Panel>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>
