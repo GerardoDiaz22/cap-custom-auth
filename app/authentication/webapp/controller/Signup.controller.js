@@ -9,7 +9,7 @@ sap.ui.define(
     return Controller.extend('auth.authentication.controller.Signup', {
       onInit: function () {
         // Define named model
-        const oModel = new JSONModel({ data: {} });
+        const oModel = new JSONModel();
         // Set model in view
         this.getView().setModel(oModel);
       },
@@ -58,6 +58,8 @@ sap.ui.define(
           oModel.setProperty('/passwordValidationMessage', '');
         }
 
+        // TODO: should make a check to see if the workstation exist
+
         // Validate workstation
         if (!workstation) {
           oModel.setProperty('/workstationValidationState', 'Error');
@@ -82,20 +84,17 @@ sap.ui.define(
 
         // Create data object
         const role = roleText === 'Administrator' ? 'admin' : 'common';
-        const data = { username, email, password, role, workstation };
+        const data = { username, email, password, role, workstation, setCookies: false };
 
         // Send POST request to API endpoint
         try {
           const response = await $.ajax({
-            url: '/api/register', // TODO: change register to signup?
+            url: '/signup', // TODO: change register to signup?
             method: 'POST',
             data: JSON.stringify(data),
             contentType: 'application/json',
             dataType: 'json',
           });
-          // Set cookies
-          // document.cookie = `jwt=${response.accessToken}; path=/`;
-          // document.cookie = `refreshJwt=${response.refreshToken}; path=/`;
           MessageToast.show(response.message); //TODO: really need to think how to handle this messages
           oRouter.navTo('login');
         } catch (err) {

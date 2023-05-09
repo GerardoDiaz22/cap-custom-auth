@@ -51,12 +51,12 @@ module.exports = function (passport) {
   );
   // JWT Strategy
   passport.use(
-    'jwt',
+    'jwtAccess',
     new JwtStrategy(
       {
         jwtFromRequest: ExtractJwt.fromExtractors([
-          (req) => req.cookies.jwt || null,
-          // ExtractJwt.fromCookie('jwt')
+          (req) => req.cookies.jwtAccessToken || null,
+          // ExtractJwt.fromCookie('jwtAccessToken')
           ExtractJwt.fromAuthHeaderAsBearerToken(),
         ]),
         secretOrKey: process.env.ACCESS_TOKEN_SECRET,
@@ -66,9 +66,8 @@ module.exports = function (passport) {
         const client = await pool.connect();
         try {
           // Get the user from the database
-          const user = await client.query('SELECT * FROM users WHERE id = $1', [
-            jwt_payload.user.id,
-          ]);
+          console.log(jwt_payload);
+          const user = await client.query('SELECT * FROM users WHERE id = $1', [jwt_payload.id]);
           // Check if the user exists
           if (user.rowCount) {
             return done(null, { user: user.rows[0], flag: false });
@@ -85,12 +84,12 @@ module.exports = function (passport) {
   );
 
   passport.use(
-    'refreshJWT',
+    'jwtRefresh',
     new JwtStrategy(
       {
         jwtFromRequest: ExtractJwt.fromExtractors([
-          (req) => req.cookies.refreshJwt || null,
-          // ExtractJwt.fromCookie('refreshJwt')
+          (req) => req.cookies.jwtRefreshToken || null,
+          // ExtractJwt.fromCookie('jwtRefreshToken')
           ExtractJwt.fromAuthHeaderAsBearerToken(),
         ]),
         secretOrKey: process.env.REFRESH_TOKEN_SECRET,
@@ -101,7 +100,8 @@ module.exports = function (passport) {
         const client = await pool.connect();
         try {
           // Check if the refresh token is in the database
-          const refreshToken = req.cookies.refreshJwt || req.headers.authorization.split(' ')[1];
+          const refreshToken =
+            req.cookies.jwtRefreshToken || req.headers.authorization.split(' ')[1];
           const validate = await client.query('SELECT * FROM refresh_tokens WHERE token = $1', [
             refreshToken,
           ]);
@@ -110,9 +110,7 @@ module.exports = function (passport) {
           }
 
           // Get the user from the database
-          const user = await client.query('SELECT * FROM users WHERE id = $1', [
-            jwt_payload.user.id,
-          ]);
+          const user = await client.query('SELECT * FROM users WHERE id = $1', [jwt_payload.id]);
 
           // Check if the user exists
           if (user.rowCount) {

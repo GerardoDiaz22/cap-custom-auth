@@ -40,6 +40,13 @@ const impl = async (app) => {
   // set static folder
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
+  const cookieOptions = {
+    maxAge: 3600000, // 1 hour in milliseconds
+    httpOnly: true,
+    /* secure: false, // allows the cookie to be sent over an insecure HTTP connection (localhost)
+    sameSite: 'none', // allows the cookie to be sent in cross-site requests */
+  };
+
   const generateAccessToken = (user) => {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
@@ -55,7 +62,7 @@ const impl = async (app) => {
   const requireAuthentication =
     ({ goToLoginOnUnauth = false, goToHomeOnAuth = false } = {}) =>
     (req, res, next) => {
-      passport.authenticate(['jwt', 'refreshJWT'], (err, payload, info) => {
+      passport.authenticate(['jwtAccess', 'jwtRefresh'], (err, payload, info) => {
         if (err || !payload) {
           // Go to login page if unauthenticated
           if (goToLoginOnUnauth) {
@@ -72,14 +79,12 @@ const impl = async (app) => {
 
         // Set user in request
         req.user = payload.user;
+        const id = payload.user.id;
 
         // Set new access token if refresh token is valid
         if (payload.flag) {
-          const accessToken = generateAccessToken({ user: { id: payload.user.id } });
-          res.cookie('jwt', accessToken, {
-            httpOnly: true,
-            // secure: true, Uncomment this on production
-          });
+          const accessToken = generateAccessToken({ id });
+          res.cookie('jwtAccessToken', accessToken, cookieOptions);
         }
 
         // Go to home page if authenticated
@@ -93,8 +98,9 @@ const impl = async (app) => {
 
   const logRequest = (req, res, next) => {
     console.log(req.method, '-', req.url);
-    next();
+    return next();
   };
+
   app.use(logRequest);
 
   /* Always Unprotected */
@@ -103,13 +109,14 @@ const impl = async (app) => {
     return res.render('error.ejs', { error: message }); // TODO: should i do this page in sapui5?
   });
 
+  // TODO: change this to DELETE
   app.post('/logout', async (req, res) => {
     const client = await pool.connect();
     try {
-      res.clearCookie('jwt');
-      res.clearCookie('refreshJwt');
-      console.log('Here!', req.cookies.refreshJwt);
-      await client.query('DELETE FROM refresh_tokens WHERE token = $1', [req.cookies.refreshJwt]);
+      const refreshToken = req.cookies.jwtRefreshToken;
+      res.clearCookie('jwtAccessToken');
+      res.clearCookie('jwtRefreshToken');
+      await client.query('DELETE FROM refresh_tokens WHERE token = $1', [refreshToken]);
       return res.redirect('/login');
     } catch (err) {
       return res.redirect(`/error?message=${encodeURIComponent(err)}`);
@@ -118,15 +125,8 @@ const impl = async (app) => {
     }
   });
 
-  /* Only Unauthenticated -> redirects to Home */
-  app.get('/authentication/webapp/*', requireAuthentication({ goToHomeOnAuth: true }));
-
-  /* Only Authenticated -> redirects to Login */
-  app.get('/', requireAuthentication({ goToLoginOnUnauth: true }));
-
-  /* Always Protected */
-  app.post('/api/login', (req, res, next) => {
-    passport.authenticate('login', { session: false }, (err, user, info) => {
+  app.post('/login', (req, res, next) => {
+    passport.authenticate('login', { session: false }, async (err, user, info) => {
       if (err) {
         const message = info.message || 'Unexpected error';
         return res.status(500).json({ message });
@@ -137,83 +137,38 @@ const impl = async (app) => {
         return res.status(401).json({ message });
       }
 
-      req.login(user, { session: false }, async (err) => {
-        if (err) {
-          return res.status(500).send(err);
+      const client = await pool.connect(); //TODO: check how to handle an error here
+      try {
+        // Get user from database
+        const result = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
+        // Get user ID
+        const id = result.rows[0].id;
+
+        // Generate access token
+        const accessToken = generateAccessToken({ id });
+
+        // Generate refresh token
+        const refreshToken = generateRefreshToken({ id }); // TODO: hash refrshtokens?
+        await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
+
+        const message = info.message || 'Logged in Successful'; // TODO: think how to better handle this messages
+
+        // Set cookies if requested
+        if (req.body.setCookies) {
+          res.cookie('jwtAccessToken', accessToken, cookieOptions);
+          res.cookie('jwtRefreshToken', refreshToken, cookieOptions);
+          return res.status(201).json({ message });
         }
-
-        const client = await pool.connect();
-        try {
-          // Get user from database
-          const result = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
-          // Get user ID
-          const userID = result.rows[0];
-
-          // Generate access token
-          const accessToken = generateAccessToken({ user: userID });
-
-          // Generate refresh token
-          const refreshToken = generateRefreshToken({ user: userID }); // TODO: hash refrshtokens?
-          await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
-
-          const message = info.message || 'Logged in Successful'; // TODO: think how to better handle this messages
-          return res.status(201).json({ message, accessToken, refreshToken });
-        } catch (err) {
-          return res.status(500).json({ message: err });
-        } finally {
-          client.release();
-        }
-      });
-    })(req, res, next);
-  });
-
-  app.post('/login', (req, res, next) => {
-    // This call the local strategy first
-    passport.authenticate('login', { session: false }, (err, user, info) => {
-      if (err || !user) {
-        const message = info ? info.message : 'Login failed';
-        return res.redirect(`/login?message=${encodeURIComponent(message)}`);
+        return res.status(201).json({ message, accessToken, refreshToken });
+      } catch (err) {
+        return res.status(500).json({ message: err });
+      } finally {
+        client.release();
       }
-      /* This triggers passport to create an user session object, it won't be used, but it's needed for the JWT strategy to work */
-      req.login(user, { session: false }, async (err) => {
-        if (err) {
-          return res.send(err);
-        }
-        /* The client is created before the try block so it can be used in the finally block (if an error occurs no one will catch it here) */
-        const client = await pool.connect();
-        try {
-          // Get user from database
-          const result = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
-          // Get user ID
-          const userID = result.rows[0];
-
-          // Generate access token
-          const accessToken = generateAccessToken({ user: userID });
-          res.cookie('jwt', accessToken, {
-            httpOnly: true,
-            // secure: true, // Uncomment this on production
-          });
-
-          // Generate refresh token
-          const refreshToken = generateRefreshToken({ user: userID });
-          await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
-          res.cookie('refreshJwt', refreshToken, {
-            httpOnly: true,
-            // secure: true, // Uncomment this on production
-          });
-
-          // return res.json({ token });
-          return res.redirect('/launchpad');
-        } catch (err) {
-          return res.redirect(`/login?message=${encodeURIComponent(err)}`);
-        } finally {
-          client.release();
-        }
-      });
     })(req, res, next);
   });
 
-  app.post('/api/register', async (req, res, next) => {
+  app.post('/signup', async (req, res, next) => {
     const client = await pool.connect();
     try {
       const { username, email, role, workstation, password } = req.body;
@@ -234,15 +189,23 @@ const impl = async (app) => {
         [username, email, hashedPassword, role, workstation]
       );
       // Get user ID
-      const userID = result.rows[0];
+      const id = result.rows[0];
 
       // Generate access token
-      const accessToken = generateAccessToken({ user: userID });
+      const accessToken = generateAccessToken({ id });
 
       // Generate refresh token
-      const refreshToken = generateRefreshToken({ user: userID });
+      const refreshToken = generateRefreshToken({ id });
       await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
+
       const message = 'Signup Successful';
+
+      // Set cookies if requested
+      if (req.body.setCookies) {
+        res.cookie('jwtAccessToken', accessToken, cookieOptions);
+        res.cookie('jwtRefreshToken', refreshToken, cookieOptions);
+        return res.status(201).json({ message });
+      }
       return res.status(201).json({ accessToken, refreshToken, message });
     } catch (err) {
       return res.status(500).json({ message: err });
@@ -251,68 +214,26 @@ const impl = async (app) => {
     }
   });
 
-  app.post('/register', async (req, res, next) => {
-    /* The client is created before the try block so it can be used in the finally block (if an error occurs no one will catch it here) */
-    const client = await pool.connect();
-    try {
-      const { username, email, role, workstation, password } = req.body;
-
-      // Check if user already exists
-      const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [
-        req.body.email,
-      ]);
-      if (existingUser.rowCount) {
-        const message = 'Email already exists';
-        return res.redirect(`/register?message=${encodeURIComponent(message)}`);
-      }
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Save user to database
-      const result = await client.query(
-        'INSERT INTO users (username, email, password, role, workstation) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-        [username, email, hashedPassword, role, workstation]
-      );
-      // Get user ID
-      const userID = result.rows[0];
-
-      // Generate access token
-      const accessToken = generateAccessToken({ user: userID });
-      res.cookie('jwt', accessToken, {
-        httpOnly: true,
-        // secure: true, // Uncomment this on production
-      });
-
-      // Generate refresh token
-      const refreshToken = generateRefreshToken({ user: userID });
-      await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
-      res.cookie('refreshJwt', refreshToken, {
-        httpOnly: true,
-        // secure: true, // Uncomment this on production
-      });
-
-      // return res.json({ token });
-      return res.redirect('/login');
-    } catch (err) {
-      return res.redirect(`/register?message=${encodeURIComponent(err)}`);
-    } finally {
-      client.release();
-    }
-  });
-
-  app.post('/api/token', async (req, res, next) => {
-    passport.authenticate(['refreshJWT'], (err, payload, info) => {
+  app.post('/token', async (req, res, next) => {
+    passport.authenticate(['jwtRefresh'], (err, payload, info) => {
       if (err || !payload) {
         const message = info.message || 'Invalid Token';
         return res.status(401).json({ message });
       }
-      const accessToken = generateAccessToken({ user: { id: payload.user.id } });
+      const id = payload.user.id;
+      const accessToken = generateAccessToken({ id });
       const message = info.message || 'Refresh Token Created Successfully'; // TODO: Not sure about this message
-      return res.status(201).json({ accessToken });
+      return res.status(201).json({ message, accessToken });
     })(req, res, next);
   });
 
+  /* Only Unauthenticated -> redirects to Home */
+  app.get('/authentication/webapp/*', requireAuthentication({ goToHomeOnAuth: true }));
+
+  /* Only Authenticated -> redirects to Login */
+  app.get('/', requireAuthentication({ goToLoginOnUnauth: true }));
+
+  /* Always Protected */
   app.use(requireAuthentication());
 
   app.get('/launchpad', (req, res, next) => {

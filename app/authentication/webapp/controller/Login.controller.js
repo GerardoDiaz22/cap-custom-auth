@@ -9,7 +9,7 @@ sap.ui.define(
     return Controller.extend('auth.authentication.controller.Login', {
       onInit: function () {
         // Define named model
-        const oModel = new JSONModel({ data: {} });
+        const oModel = new JSONModel();
         // Set model in view
         this.getView().setModel(oModel);
       },
@@ -46,26 +46,20 @@ sap.ui.define(
         }
 
         // Create data object
-        const data = { email, password };
+        const data = { email, password, setCookies: true };
 
         // Send POST request to API endpoint
         try {
           const response = await $.ajax({
-            url: '/api/login',
+            url: '/login',
             method: 'POST',
             data: JSON.stringify(data),
             contentType: 'application/json',
             dataType: 'json',
           });
-          console.log(response);
-          // Set cookies
-          /* FIXME: These cookies are unprotected, it seems there's no way to set the httponly flag in localhost unless allowing it manually on the browser */
-          document.cookie = `jwt=${response.accessToken}; path=/`;
-          document.cookie = `refreshJwt=${response.refreshToken}; path=/`;
           // Navigate to home page
           window.location.href = 'http://localhost:4004/'; // TODO: think of a better way to do this
         } catch (err) {
-          console.error(err);
           const errorMessage = err.responseJSON.message || 'Something went wrong';
           MessageToast.show(errorMessage);
         }
