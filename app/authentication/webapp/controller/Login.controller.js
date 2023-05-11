@@ -60,7 +60,10 @@ sap.ui.define(
           // Navigate to home page
           window.location.href = 'http://localhost:4004/'; // TODO: think of a better way to do this
         } catch (err) {
-          const errorMessage = err.responseJSON.message || 'Something went wrong';
+          const errorMessage =
+            err.responseJSON.message && typeof err.responseJSON.message === 'string'
+              ? err.responseJSON.message
+              : 'Something went wrong';
           MessageToast.show(errorMessage);
         }
       },

@@ -98,11 +98,10 @@ sap.ui.define(
           MessageToast.show(response.message); //TODO: really need to think how to handle this messages
           oRouter.navTo('login');
         } catch (err) {
-          console.error(err);
           const errorMessage =
-            typeof err.responseJSON.message === 'string'
+            err.responseJSON.message && typeof err.responseJSON.message === 'string'
               ? err.responseJSON.message
-              : err.statusText;
+              : 'Something went wrong';
           MessageToast.show(errorMessage);
         }
       },
