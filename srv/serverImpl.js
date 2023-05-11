@@ -40,11 +40,22 @@ const impl = async (app) => {
   // set static folder
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
-  const cookieOptions = {
-    maxAge: 3600000, // 1 hour in milliseconds
-    httpOnly: true,
-    /* secure: false, // allows the cookie to be sent over an insecure HTTP connection (localhost)
-    sameSite: 'none', // allows the cookie to be sent in cross-site requests */
+  const cookieOptions = (time, unit) => {
+    const millisPerUnit = {
+      seconds: 1000,
+      minutes: 60 * 1000,
+      hours: 60 * 60 * 1000,
+      days: 24 * 60 * 60 * 1000,
+    };
+
+    const maxAge = time * millisPerUnit[unit];
+
+    return {
+      maxAge,
+      httpOnly: true,
+      /* secure: false, // allows the cookie to be sent over an insecure HTTP connection (localhost)
+       sameSite: 'none', // allows the cookie to be sent in cross-site requests */
+    };
   };
 
   const generateAccessToken = (user) => {
@@ -84,7 +95,7 @@ const impl = async (app) => {
         // Set new access token if refresh token is valid
         if (payload.flag) {
           const accessToken = generateAccessToken({ id });
-          res.cookie('jwtAccessToken', accessToken, cookieOptions);
+          res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
         }
 
         // Go to home page if authenticated
@@ -155,8 +166,8 @@ const impl = async (app) => {
 
         // Set cookies if requested
         if (req.body.setCookies) {
-          res.cookie('jwtAccessToken', accessToken, cookieOptions);
-          res.cookie('jwtRefreshToken', refreshToken, cookieOptions);
+          res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
+          res.cookie('jwtRefreshToken', refreshToken, cookieOptions(90, 'days'));
           return res.status(201).json({ message });
         }
         return res.status(201).json({ message, accessToken, refreshToken });
@@ -202,8 +213,8 @@ const impl = async (app) => {
 
       // Set cookies if requested
       if (req.body.setCookies) {
-        res.cookie('jwtAccessToken', accessToken, cookieOptions);
-        res.cookie('jwtRefreshToken', refreshToken, cookieOptions);
+        res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
+        res.cookie('jwtRefreshToken', refreshToken, cookieOptions(90, 'days'));
         return res.status(201).json({ message });
       }
       return res.status(201).json({ accessToken, refreshToken, message });
