@@ -66,7 +66,6 @@ module.exports = function (passport) {
         const client = await pool.connect();
         try {
           // Get the user from the database
-          console.log(jwt_payload);
           const user = await client.query('SELECT * FROM users WHERE id = $1', [jwt_payload.id]);
           // Check if the user exists
           if (user.rowCount) {
