@@ -1,12 +1,23 @@
-<mvc:View controllerName="home.home.controller.Home"
-    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+<mvc:View
+    controllerName="home.home.controller.Home"
+    displayBlock="true"
+    xmlns:layout="sap.ui.layout" 
+    xmlns:mvc="sap.ui.core.mvc" 
     xmlns="sap.m">
     <Page id="page" title="{i18n>title}" showHeader="false">
         <content>
             <FlexBox id="homeLayout" height="100%" alignItems="Center" justifyContent="Center">
-                <Panel id="homePanel" class="shadow" width="600px" height="300px">
-                    <Label id="userHeader" text="Welcome, {>Products('4fd0e8fa-8709-48d9-9b02-2758b4711c76')>name} (Admin)" />
-                    <Button id="homeBtnLogout" text="Logout" press="onLogoutPress" />
+                <Panel id="homePanel" class="shadow" width="600px" height="300px" >
+                    <FlexBox id="panelLayout" height="100%" alignItems="Center" justifyContent="Center">
+                    <VBox id="subPanelLayout" alignItems="Center">
+                        <HBox id="userLayout" class="sapUiSmallMarginBottom">
+                            <Title  id="usernameText" text="{ path: 'user>/username', targetType: 'any' }"/>
+                            <Label id="userSeparator" text="-" class="sapUiTinyMarginBeginEnd"/>
+                            <Title  id="rolesText" text="{ path: 'user>/roles', targetType: 'any', formatter: '.formatRoles' }"/>
+                        </HBox>
+                        <Button id="homeBtnLogout" text="Logout" class="logoutBtn" press="onLogoutPress" />
+                    </VBox>
+                    </FlexBox>
                 </Panel>
             </FlexBox>
         </content>

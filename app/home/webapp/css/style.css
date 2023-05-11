@@ -2,3 +2,7 @@
 .shadow {
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+.logoutBtn {
+  width: 125px !important;
+}
