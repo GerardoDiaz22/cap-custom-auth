@@ -120,17 +120,22 @@ const impl = async (app) => {
     return res.render('error.ejs', { error: message }); // TODO: should i do this page in sapui5?
   });
 
-  // TODO: change this to DELETE
+  // TODO: maybe i should make redirects from /login to the webapp login page
+
+  /* This should be a DELETE request, but we need to send the clearCookie option in the body */
   app.post('/logout', async (req, res) => {
     const client = await pool.connect();
     try {
       const refreshToken = req.cookies.jwtRefreshToken;
-      res.clearCookie('jwtAccessToken');
-      res.clearCookie('jwtRefreshToken');
       await client.query('DELETE FROM refresh_tokens WHERE token = $1', [refreshToken]);
-      return res.redirect('/login');
+      // Clear cookies if requested
+      if (req.body.clearCookies) {
+        res.clearCookie('jwtAccessToken');
+        res.clearCookie('jwtRefreshToken');
+      }
+      return res.status(200).json({ message: 'Logged out successfully' });
     } catch (err) {
-      return res.redirect(`/error?message=${encodeURIComponent(err)}`);
+      return res.status(500).json({ message: 'Unexpected error' });
     } finally {
       client.release();
     }
@@ -246,11 +251,6 @@ const impl = async (app) => {
 
   /* Always Protected */
   app.use(requireAuthentication());
-
-  app.get('/launchpad', (req, res, next) => {
-    const user = req.user;
-    return res.render('launchpad.ejs', { username: user.username, role: user.role });
-  });
 
   app.get('/workstations', async (req, res, next) => {
     const workstationHub = [
