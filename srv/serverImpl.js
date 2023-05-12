@@ -3,6 +3,7 @@ const express = require('express');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
@@ -283,6 +284,18 @@ const impl = async (app) => {
       return res.json(workstationHub.filter((workstation) => workstation.ID === req.query.ID));
     }
     return res.json(workstationHub);
+  });
+
+  app.get('/apps', (req, res, next) => {
+    const directoryPath = path.join(__dirname, '..', 'app');
+    fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Error reading directory' });
+      }
+      const apps = files.filter((file) => file.isDirectory()).map((dir) => dir.name);
+      return res.status(200).json({ apps });
+    });
   });
 };
 
