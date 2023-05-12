@@ -9,6 +9,7 @@
                     <Input id="emailInput"
                         type="Email"
                         class="sapUiSmallMarginBottom"
+                        submit="onLoginPress"
                         placeholder="{i18n>emailPlaceholder}"
                         valueState="{ path: '/emailValidationState' }"
                         valueStateText="{ path: '/emailValidationMessage' }"/>
@@ -16,6 +17,7 @@
                     <Input id="passwordInput"
                         type="Password"
                         class="sapUiSmallMarginBottom"
+                        submit="onLoginPress"
                         placeholder="{i18n>passwordPlaceholder}"
                         valueState="{ path: '/passwordValidationState' }"
                         valueStateText="{ path: '/passwordValidationMessage' }"/>

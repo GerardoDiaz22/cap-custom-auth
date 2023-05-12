@@ -13,6 +13,7 @@
                     <Input id="nameInput"
                         type="Text"
                         class="sapUiSmallMarginBottom"
+                        submit="onSignupPress"
                         placeholder="{i18n>namePlaceholder}"
                         valueState="{ path: '/nameValidationState' }"
                         valueStateText="{ path: '/nameValidationMessage' }"/>
@@ -20,6 +21,7 @@
                     <Input id="emailInput"
                         type="Email"
                         class="sapUiSmallMarginBottom"
+                        submit="onSignupPress"
                         placeholder="{i18n>emailPlaceholder}"
                         valueState="{ path: '/emailValidationState' }"
                         valueStateText="{ path: '/emailValidationMessage' }"/>
@@ -27,6 +29,7 @@
                     <Input id="passwordInput"
                         type="Password"
                         class="sapUiSmallMarginBottom"
+                        submit="onSignupPress"
                         placeholder="{i18n>passwordPlaceholder}"
                         valueState="{ path: '/passwordValidationState' }"
                         valueStateText="{ path: '/passwordValidationMessage' }"/>
@@ -34,6 +37,7 @@
                     <Input id="workstationInput"
                         type="Number"
                         class="sapUiSmallMarginBottom"
+                        submit="onSignupPress"
                         placeholder="{i18n>workstationPlaceholder}"
                         valueState="{ path: '/workstationValidationState' }"
                         valueStateText="{ path: '/workstationValidationMessage' }"/>
