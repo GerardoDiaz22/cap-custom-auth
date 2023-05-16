@@ -30,7 +30,7 @@
 }
 ```
 
-- Change your password in the .env file:
+- Create a .env file in the root of the project and insert the following content:
 
 ```
 ACCESS_TOKEN_SECRET=f69fb335ae6244c39b870620765875722ec0574310e5f1757392e03795d164de
