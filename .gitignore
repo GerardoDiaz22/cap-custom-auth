@@ -25,6 +25,7 @@ mta_archives/
 .prettierignore
 *.iml
 *.flattened-pom.xml
+*.env
 
 # IDEs
 .vscode
