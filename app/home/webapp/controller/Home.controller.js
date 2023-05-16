@@ -9,11 +9,26 @@ sap.ui.define(
     return Controller.extend('home.home.controller.Home', {
       onInit: async function () {
         try {
+          /* Get user info */
           const { '@odata.context': context, ...oUser } = await $.get('/service/products/userInfo()');
-          console.log(oUser);
+
+          /* Set user info to model */
           const oModel = new JSONModel(oUser);
-          console.log(oModel);
+
+          /* Set user model to view */
           this.getView().setModel(oModel, 'user');
+
+          /* Get apps */
+          const { apps } = await $.get('/apps');
+
+          /* Get services */
+          const { value: services } = await $.get('/service/products');
+
+          /* Set apps and services to model */
+          const oTiles = new JSONModel({ apps, services });
+
+          /* Set tile model to view */
+          this.getView().setModel(oTiles, 'tiles');
         } catch (err) {
           console.error(err);
           MessageToast.show(err);
@@ -39,6 +54,26 @@ sap.ui.define(
       },
       formatRoles: function (roles) {
         return roles.join(', ');
+      },
+      onPressAppTile: function (oEvent) {
+        /* Get pressed tile object */
+        const oTile = oEvent.getSource().getBindingContext('tiles').getObject();
+
+        /* Set app url with tile information */
+        const sUrl = oTile.name + '/webapp/index.html';
+
+        /* Go to url */
+        $(location).attr('href', 'http://localhost:4004/' + sUrl); // window.location.href = 'http://localhost:4004/' + sUrl;
+      },
+      onPressSrvTile: function (oEvent) {
+        /* Get pressed tile object */
+        const oTile = oEvent.getSource().getBindingContext('tiles').getObject();
+
+        /* Set service url with tile information */
+        const sUrl = 'service/products/' + oTile.url;
+
+        /* Go to url */
+        $(location).attr('href', 'http://localhost:4004/' + sUrl); // window.location.href = 'http://localhost:4004/' + sUrl;
       },
     });
   }

@@ -310,7 +310,8 @@ const impl = async (app) => {
 
   app.get('/apps', async (req, res, next) => {
     try {
-      const apps = await getDirs('app');
+      const appsDirs = await getDirs('app');
+      const apps = appsDirs.map((item) => ({ name: item }));
       return res.status(200).json({ apps });
     } catch (err) {
       return res.status(500).json({ message: 'Error reading directory', error: err });
