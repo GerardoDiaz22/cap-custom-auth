@@ -99,13 +99,10 @@ module.exports = function (passport) {
         const client = await pool.connect();
         try {
           // Check if the refresh token is in the database
-          const refreshToken =
-            req.cookies.jwtRefreshToken || req.headers.authorization.split(' ')[1];
-          const validate = await client.query('SELECT * FROM refresh_tokens WHERE token = $1', [
-            refreshToken,
-          ]);
+          const refreshToken = req.cookies.jwtRefreshToken || req.headers.authorization.split(' ')[1];
+          const validate = await client.query('SELECT * FROM refresh_tokens WHERE token = $1', [refreshToken]);
           if (!validate.rowCount) {
-            return done(null, false, { message: 'Invalid token' });
+            return done(null, false, { message: 'Refresh Token Expired' });
           }
 
           // Get the user from the database
