@@ -75,18 +75,22 @@
         "viewPath": "auth.authentication.view",
         "controlAggregation": "pages",
         "controlId": "app",
-        "clearControlAggregation": false
+        "clearControlAggregation": false,
+        "bypassed": {
+          "target": "notFound"
+        },
+        "path": "auth.authentication.view"
       },
       "routes": [
         {
           "pattern": "",
           "name": "login",
-          "target": ["login"]
+          "target": "login"
         },
         {
           "pattern": "signup",
           "name": "signup",
-          "target": ["signup"]
+          "target": "signup"
         }
       ],
       "targets": {
@@ -103,6 +107,13 @@
           "clearControlAggregation": false,
           "viewId": "signup",
           "viewName": "Signup"
+        },
+        "notFound": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "notFound",
+          "viewName": "NotFound"
         }
       }
     },
@@ -111,6 +122,11 @@
       "type": "XML",
       "async": true,
       "id": "App"
+    },
+    "extends": {
+      "extensions": {
+        "sap.ui.controllerExtensions": {}
+      }
     }
   }
 }

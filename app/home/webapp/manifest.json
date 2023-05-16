@@ -95,7 +95,10 @@
         "viewPath": "home.home.view",
         "controlAggregation": "pages",
         "controlId": "app",
-        "clearControlAggregation": false
+        "clearControlAggregation": false,
+        "bypassed": {
+          "target": "notFound"
+        }
       },
       "routes": [
         {
@@ -111,6 +114,13 @@
           "clearControlAggregation": false,
           "viewId": "Home",
           "viewName": "Home"
+        },
+        "notFound": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "notFound",
+          "viewName": "NotFound"
         }
       }
     },
