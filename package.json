@@ -65,7 +65,8 @@
     "app/products-worklist",
     "app/sales",
     "app/authentication",
-    "app/home"
+    "app/home",
+    "app/sofognd002"
   ],
   "cds": {
     "requires": {
