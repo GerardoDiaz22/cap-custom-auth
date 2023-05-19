@@ -261,6 +261,7 @@ const impl = async (app) => {
   /* Always Protected */
   app.use(requireAuthentication());
 
+  /*
   app.get('/workstations', async (req, res, next) => {
     const workstationHub = [
       {
@@ -307,6 +308,7 @@ const impl = async (app) => {
       });
     });
   };
+  */
 
   app.get('/apps', async (req, res, next) => {
     try {

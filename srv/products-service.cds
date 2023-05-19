@@ -2,6 +2,9 @@ using {sap.jwt.products as my} from '../db/schema';
 
 @path: 'service/products'
 service ProductsService @(requires: 'authenticated-user') {
+    
+    entity Workstations as projection on my.Workstations;
+    
     entity Products @(restrict: [
         {
             grant: ['*'],
@@ -39,6 +42,7 @@ service ProductsService @(requires: 'authenticated-user') {
         sociedades : array of String;
         centros    : array of String;
         oficinas   : array of String;
+        apps       : array of String;
     }
 
 
