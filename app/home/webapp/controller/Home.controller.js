@@ -19,7 +19,7 @@ sap.ui.define(
           this.getView().setModel(oModel, 'user');
 
           /* Get apps */
-          const { apps } = await $.get('/apps');
+          const apps = oUser.attr.apps.map((app) => ({ name: app }));
 
           /* Get services */
           const { value: services } = await $.get('/service/products');
