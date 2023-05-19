@@ -5,6 +5,25 @@ using {
     cuid
 } from '@sap/cds/common';
 
+entity Workstations {
+    key codigo : Integer;
+    sociedades : array of String;
+    centros    : array of String;
+    oficinas   : array of String;
+    apps       : Association to many WorkstationApps on apps.workstation = $self;
+}
+
+entity WorkstationApps : cuid {
+  key workstation : Association to Workstations;
+  key app         : Association to Apps;
+}
+
+entity Apps {
+    key codigo   : String;
+    status       : Boolean;
+    workstations : Association to many WorkstationApps on workstations.app = $self;
+}
+
 entity Products : cuid {
     sociedad : String;
     name     : String;
