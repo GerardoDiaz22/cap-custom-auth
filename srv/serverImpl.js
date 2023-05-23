@@ -294,6 +294,7 @@ const impl = async (app) => {
     }
     return res.json(workstationHub);
   });
+  */
 
   const getDirs = async (directory) => {
     return new Promise((resolve, reject) => {
@@ -308,7 +309,6 @@ const impl = async (app) => {
       });
     });
   };
-  */
 
   app.get('/apps', async (req, res, next) => {
     try {
