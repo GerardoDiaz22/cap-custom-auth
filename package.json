@@ -13,7 +13,6 @@
     "cds-pg": "^0.1.36",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
-    "ejs": "^3.1.9",
     "express": "^4",
     "jsonwebtoken": "^9.0.0",
     "node-cache": "^5.1.2",
