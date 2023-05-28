@@ -68,7 +68,6 @@
     "app/sales",
     "app/authentication",
     "app/home",
-    "app/sofognd002",
     "app/error"
   ],
   "cds": {

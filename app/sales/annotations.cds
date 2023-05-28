@@ -1,4 +1,4 @@
-using ProductsService as service from '../../srv/products-service';
+using FinanceService as service from '../../srv/finance-service';
 
 annotate service.Sales with @(
     UI.LineItem : [

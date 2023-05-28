@@ -292,7 +292,7 @@ const impl = async (app) => {
       const apps = await getDirs('app');
       if (
         apps.some((app) => req.originalUrl.startsWith(`/${app}`)) ||
-        req.originalUrl.startsWith(`/service/products`) ||
+        req.originalUrl.startsWith(`/service/`) ||
         req.originalUrl === '/'
       ) {
         return next();

@@ -10,7 +10,7 @@ sap.ui.define(
       onInit: async function () {
         try {
           /* Get user info */
-          const { '@odata.context': context, ...oUser } = await $.get('/service/products/userInfo()');
+          const { '@odata.context': context, ...oUser } = await $.get('/service/users/userInfo()');
 
           /* Set user info to model */
           const oModel = new JSONModel(oUser);
@@ -21,8 +21,10 @@ sap.ui.define(
           /* Get apps */
           const apps = oUser.attr.apps.map((app) => ({ name: app }));
 
+          console.log(document.cookie);
+
           /* Get services */
-          const { value: services } = await $.get('/service/products');
+          const { value: services } = await $.get('/service/finance');
 
           /* Set apps and services to model */
           const oTiles = new JSONModel({ apps, services });

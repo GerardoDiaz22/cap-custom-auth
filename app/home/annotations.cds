@@ -1,1 +1,1 @@
-using ProductsService as service from '../../srv/products-service';
+using FinanceService as service from '../../srv/finance-service';
