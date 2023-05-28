@@ -261,41 +261,6 @@ const impl = async (app) => {
   /* Always Protected */
   app.use(requireAuthentication());
 
-  /*
-  app.get('/workstations', async (req, res, next) => {
-    const workstationHub = [
-      {
-        ID: '1',
-        sociedades: ['1001'],
-        centros: ['1001'],
-        oficinas: ['1001'],
-      },
-      {
-        ID: '2',
-        sociedades: ['1002'],
-        centros: ['1002'],
-        oficinas: ['1002'],
-      },
-      {
-        ID: '3',
-        sociedades: ['1003'],
-        centros: ['1001'],
-        oficinas: ['1004'],
-      },
-      {
-        ID: '4',
-        sociedades: ['1004'],
-        centros: ['1003'],
-        oficinas: ['1006'],
-      },
-    ];
-    if (req.query?.ID) {
-      return res.json(workstationHub.filter((workstation) => workstation.ID === req.query.ID));
-    }
-    return res.json(workstationHub);
-  });
-  */
-
   const getDirs = async (directory) => {
     return new Promise((resolve, reject) => {
       const directoryPath = path.join(__dirname, '..', directory);
