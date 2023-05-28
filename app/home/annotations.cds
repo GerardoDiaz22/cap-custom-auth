@@ -1,1 +1,0 @@
-using FinanceService as service from '../../srv/finance-service';
