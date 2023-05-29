@@ -34,7 +34,7 @@
     "load:pg": "npx cds-dbm load --via delta"
   },
   "engines": {
-    "node": "^16.15"
+    "node": "^18.16"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
