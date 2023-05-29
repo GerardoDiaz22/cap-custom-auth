@@ -21,8 +21,6 @@ sap.ui.define(
           /* Get apps */
           const apps = oUser.attr.apps.map((app) => ({ name: app }));
 
-          console.log(document.cookie);
-
           /* Get services */
           const { value: services } = await $.get('/service/finance');
 
