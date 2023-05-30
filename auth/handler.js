@@ -79,6 +79,7 @@ module.exports = async (req, res, next) => {
       `SELECT from WorkstationApps { workstation, app { name } } WHERE workstation = ${sapWorkstation.id}`
     );
     const srvResponse = await tx.run(query);
+    await tx.commit();
 
     // Get the apps names
     const apps = srvResponse.length === 0 ? null : srvResponse.map((item) => item.app.name);
