@@ -71,11 +71,14 @@ module.exports = async (req, res, next) => {
     // Connect to user service
     const srv = await cds.connect.to('UsersService');
 
+    // Create a transaction with the admin role context
+    const tx = srv.tx({ user: { roles: ['admin'] } });
+
     // Get the apps assigned to the workstation
     const query = cds.parse.cql(
       `SELECT from WorkstationApps { workstation, app { name } } WHERE workstation = ${sapWorkstation.id}`
     );
-    const srvResponse = await srv.run(query);
+    const srvResponse = await tx.run(query);
 
     // Get the apps names
     const apps = srvResponse.length === 0 ? null : srvResponse.map((item) => item.app.name);
@@ -93,7 +96,6 @@ module.exports = async (req, res, next) => {
       roles: [req.user.role],
       attr: userWorkstation,
     });
-    // req.tenant is for different companies (running a multitenant environment)
 
     return next();
   } catch (err) {
