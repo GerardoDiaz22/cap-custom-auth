@@ -28,7 +28,7 @@
   },
   "scripts": {
     "start": "cds run",
-    "deploy:auth": "node ./db/db-init.js",
+    "deploy:auth": "node ./db/users-db-init.js",
     "deploy:pg": "npx cds-dbm deploy --create-db --load-via delta",
     "deploy:pg:clean": "npx cds-dbm deploy --create-db --auto-undeploy --load-via full",
     "load:pg": "npx cds-dbm load --via delta"
