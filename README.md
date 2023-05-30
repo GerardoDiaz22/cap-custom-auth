@@ -1,3 +1,9 @@
+## Requirements
+
+- Postgres 14
+- CDS
+- Node 18
+
 ## Commands
 
 - `npm install`
@@ -43,4 +49,6 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 ACCESS_TOKEN_EXPIRATION=1h
 REFRESH_TOKEN_EXPIRATION=30d
+PORT=4004
+SAP_URL=http://192.168.110.142:8000/sap/opu/odata/sap/
 ```
