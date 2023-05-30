@@ -1,7 +1,7 @@
 require('dotenv').config();
 const cds = require('@sap/cds');
 const NodeCache = require('node-cache');
-const cache = new NodeCache({ stdTTL: 3600 }); // 5min: 300
+const cache = new NodeCache({ stdTTL: 3600 }); // 1 hour
 
 module.exports = async (req, res, next) => {
   if (!req.user) {
@@ -29,7 +29,14 @@ module.exports = async (req, res, next) => {
     };
 
     // Make the request to the SAP Gateway
-    const sapResponse = await fetch(sapURL, sapConfig);
+    const sapResponse = await fetch(sapURL, sapConfig).catch((err) => Response.error());
+
+    /**
+     * The fetch function attempts to resolve into a Response object, even if it encounters HTTP errors.
+     * However, if there are network issues, it will throw a rejected promise.
+     * To handle this scenario, we use Response.error() to ensure that the fetch function resolves to a default error.
+     * This error will not pass the sapResponse.ok check, so it is a reliable solution.
+     */
 
     // Check if the request was successful
     if (sapResponse.ok) {
@@ -90,7 +97,6 @@ module.exports = async (req, res, next) => {
 
     return next();
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ message: 'Internal Server Error', error: err });
   }
 };
