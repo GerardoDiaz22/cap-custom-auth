@@ -1,0 +1,42 @@
+<mvc:View controllerName="auth.authentication.controller.Login"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form">
+    <Page id="page" title="{i18n>titleLogin}" showHeader="false" >
+        <content>
+            <FlexBox id="loginLayout" height="100%" alignItems="Center" justifyContent="Center">
+                <form:SimpleForm
+                    id="loginForm"
+                    title="{i18n>headerLogin}"
+                    class="shadow formPanel"
+                    width="600px"
+                    maxContainerCols="1"
+                    editable="true"
+                    layout="ResponsiveGridLayout">
+                    <form:content>
+                        <Label id="emailLabel" text="{i18n>emailLabel}" labelFor="emailInput"/>
+                        <Input id="emailInput"
+                            type="Email"
+                            class="sapUiSmallMarginBottom"
+                            submit="onLoginPress"
+                            placeholder="{i18n>emailPlaceholder}"
+                            valueState="{ path: '/emailValidationState' }"
+                            valueStateText="{ path: '/emailValidationMessage' }"/>
+                        <Label id="passwordLabel" text="{i18n>passwordLabel}" labelFor="passwordInput"/>
+                        <Input id="passwordInput"
+                            type="Password"
+                            class="sapUiMediumMarginBottom"
+                            submit="onLoginPress"
+                            placeholder="{i18n>passwordPlaceholder}"
+                            valueState="{ path: '/passwordValidationState' }"
+                            valueStateText="{ path: '/passwordValidationMessage' }"/>
+                        <Button id="loginButton" text="{i18n>buttonLogin}" class="loginBtn sapUiSmallMarginBottom" type="Emphasized" press="onLoginPress"/> <!-- type="Accept" doesn't use desired styling -->
+                        <Link id="signupLink" text="{i18n>linkSignup}" press="onSignupLinkPress"/>
+                    </form:content>
+                </form:SimpleForm>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>

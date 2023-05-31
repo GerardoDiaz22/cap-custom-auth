@@ -1,0 +1,7 @@
+sociedad; centro; oficina; name;  price
+1001; 1001; 1001; Food;  50.0
+1002; 1002; 1002; Clothes;  5.0
+1003; 1003; 1003; Electronics; 400.0
+1001; 1002; 1003; Paper;  250.0
+1002; 1002; 1002; Tables;  530.0
+1000; 1000; 1000; Chairs;  100.0

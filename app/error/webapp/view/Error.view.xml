@@ -1,0 +1,22 @@
+<mvc:View controllerName="error.error.controller.Error"
+    displayBlock="true"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout" 
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}" showHeader="false">
+        <content>
+            <FlexBox id="errorLayout" height="100%" alignItems="Center" justifyContent="Center">
+                    <VBox id="subErrorLayout" class="errorDisplay" alignItems="Center">
+                            <core:Icon
+                                id="errorIcon"
+                                src="{ path: 'error>/icon', targetType: 'any' }"
+                                class="icon sapUiSmallMarginBottom">
+                            </core:Icon>
+                            <Text id="errorTitle" class="title sapUiTinyMarginBottom" text="{ path: 'error>/statusCode', targetType: 'any' }" />
+                            <Text id="errorText" class="subtitle" text="{ path: 'error>/message', targetType: 'any' }"/>
+                    </VBox>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>

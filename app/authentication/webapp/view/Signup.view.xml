@@ -1,0 +1,67 @@
+<mvc:View controllerName="auth.authentication.controller.Signup"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout">
+    <Page id="page" title="{i18n>titleSignup}" showHeader="false">
+        <content>
+            <FlexBox id="signupLayout" height="100%" alignItems="Center" justifyContent="Center">
+                <form:SimpleForm
+                    id="signupForm"
+                    title="{i18n>headerSignup}"
+                    class="shadow formPanel"
+                    width="600px"
+                    maxContainerCols="1"
+                    editable="true"
+                    layout="ResponsiveGridLayout">
+                    <form:content>
+                        <Label id="nameLabel" text="{i18n>nameLabel}" labelFor="nameInput"/>
+                        <Input id="nameInput"
+                            type="Text"
+                            class="sapUiSmallMarginBottom"
+                            submit="onSignupPress"
+                            placeholder="{i18n>namePlaceholder}"
+                            valueState="{ path: '/nameValidationState' }"
+                            valueStateText="{ path: '/nameValidationMessage' }"/>
+                        <Label id="emailLabel" text="{i18n>emailLabel}" labelFor="emailInput"/>
+                        <Input id="emailInput"
+                            type="Email"
+                            class="sapUiSmallMarginBottom"
+                            submit="onSignupPress"
+                            placeholder="{i18n>emailPlaceholder}"
+                            valueState="{ path: '/emailValidationState' }"
+                            valueStateText="{ path: '/emailValidationMessage' }"/>
+                        <Label id="passwordLabel" text="{i18n>passwordLabel}" labelFor="passwordInput"/>
+                        <Input id="passwordInput"
+                            type="Password"
+                            class="sapUiSmallMarginBottom"
+                            submit="onSignupPress"
+                            placeholder="{i18n>passwordPlaceholder}"
+                            valueState="{ path: '/passwordValidationState' }"
+                            valueStateText="{ path: '/passwordValidationMessage' }"/>
+                        <Label id="workstationLabel" text="{i18n>workstationLabel}" labelFor="workstationInput"/>
+                        <Input id="workstationInput"
+                            type="Number"
+                            class="sapUiSmallMarginBottom"
+                            submit="onSignupPress"
+                            placeholder="{i18n>workstationPlaceholder}"
+                            valueState="{ path: '/workstationValidationState' }"
+                            valueStateText="{ path: '/workstationValidationMessage' }"/>
+                        <Label id="roleLabel" text="{i18n>roleLabel}" labelFor="roleInput"/>
+                        <RadioButtonGroup id="roleInput"
+                        columns="3"
+                        class="sapUiSmallMarginBottom"
+                        valueState="{ path: '/roleValidationState' }">
+                            <RadioButton id="roleInputAdmin" text="Administrator"/> <!-- TODO: check if there's an option to not enable a radio button on init -->
+                            <RadioButton id="roleInputCommon" text="Common"/>
+                        </RadioButtonGroup>
+                        <Button id="signupButton" text="{i18n>buttonSignup}" class="signupBtn sapUiSmallMarginBottom" type="Emphasized" press="onSignupPress"/> <!-- type="Accept" doesn't use desired styling -->
+                        <Link id="loginLink" text="{i18n>linkLogin}" press="onLoginLinkPress"/>
+                    </form:content>
+                </form:SimpleForm>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>

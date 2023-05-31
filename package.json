@@ -1,0 +1,101 @@
+{
+  "name": "sap-jwt",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": "^6",
+    "axios": "^1.4.0",
+    "bcrypt": "^5.1.0",
+    "cds-dbm": "^0.1.4",
+    "cds-pg": "^0.1.36",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "express": "^4",
+    "jsonwebtoken": "^9.0.0",
+    "node-cache": "^5.1.2",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
+    "pg": "^8.10.0"
+  },
+  "devDependencies": {
+    "@sap/ux-specification": "^1.108.5",
+    "sqlite3": "^5.0.4"
+  },
+  "scripts": {
+    "start": "cds run",
+    "deploy:auth": "node ./db/db-init.js",
+    "deploy:pg": "npx cds-dbm deploy --create-db --load-via delta",
+    "deploy:pg:clean": "npx cds-dbm deploy --create-db --auto-undeploy --load-via full",
+    "load:pg": "npx cds-dbm load --via delta"
+  },
+  "engines": {
+    "node": "^18.16"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "env": {
+      "es2020": true,
+      "node": true,
+      "jest": true,
+      "mocha": true
+    },
+    "globals": {
+      "SELECT": true,
+      "INSERT": true,
+      "UPDATE": true,
+      "DELETE": true,
+      "CREATE": true,
+      "DROP": true,
+      "CDL": true,
+      "CQL": true,
+      "CXL": true,
+      "cds": true
+    },
+    "rules": {
+      "no-console": "off",
+      "require-atomic-updates": "off"
+    }
+  },
+  "sapux": [
+    "app/products-worklist",
+    "app/sales",
+    "app/authentication",
+    "app/home",
+    "app/error"
+  ],
+  "cds": {
+    "requires": {
+      "auth": {
+        "impl": "./auth/handler.js"
+      },
+      "db": {
+        "kind": "postgres"
+      },
+      "postgres": {
+        "impl": "cds-pg",
+        "dialect": "plain",
+        "model": [
+          "srv"
+        ]
+      }
+    },
+    "migrations": {
+      "db": {
+        "schema": {
+          "default": "public",
+          "clone": "_cdsdbm_clone",
+          "reference": "_cdsdbm_ref"
+        },
+        "deploy": {
+          "tmpFile": "tmp/_autodeploy.json",
+          "undeployFile": "db/undeploy.json"
+        }
+      }
+    }
+  }
+}

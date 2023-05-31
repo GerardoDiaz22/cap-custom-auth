@@ -1,0 +1,22 @@
+/* Enter your custom styles here */
+.shadow {
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logoutBtn {
+  width: 125px !important;
+}
+
+.icon {
+  color: #788fa6;
+  font-size: 60pt;
+}
+
+.subtitle {
+  color: #556b82;
+  font-size: 20pt;
+}
+
+.title {
+  font-size: 25pt;
+}

@@ -1,0 +1,23 @@
+<mvc:View
+    controllerName="home.home.controller.Home"
+    displayBlock="true"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout" 
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m">
+    <Page id="page" title="Not Found" showHeader="false">
+        <content>
+            <FlexBox id="errorLayout" height="100%" alignItems="Center" justifyContent="Center">
+                    <VBox id="subErrorLayout" class="errorDisplay" alignItems="Center">
+                            <core:Icon
+                                id="errorIcon"
+                                src="sap-icon://document"
+                                class="icon sapUiSmallMarginBottom">
+                            </core:Icon>
+                            <Text id="errorTitle" class="title sapUiTinyMarginBottom" text="404: Not Found" />
+                            <Text id="errorText" class="subtitle" text="Requested resource not found"/>
+                    </VBox>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>
