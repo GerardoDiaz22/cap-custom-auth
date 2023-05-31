@@ -1,44 +1,31 @@
 sap.ui.define(
-  ['sap/ui/core/mvc/Controller', 'sap/ui/model/json/JSONModel', 'sap/m/MessageToast', 'sap/ui/commons/ComboBox', 'sap/ui/core/ListItem'],
+  ['sap/ui/core/mvc/Controller',
+    'sap/ui/model/json/JSONModel',
+    'sap/m/MessageToast',
+    'sap/ui/core/Fragment',
+    'sap/m/MenuItem'],
   /**
    * @param {typeof sap.ui.core.mvc.Controller} Controller
    */
-  function (Controller, JSONModel, MessageToast, ComboBox, ListItem) {
+  function (Controller,
+    JSONModel,
+    MessageToast,
+    Fragment,
+    MenuItem) {
     'use strict';
 
     return Controller.extend('home.home.controller.Home', {
       onInit: async function () {
-
-        var oComboBox1 = new ComboBox("ComboBox1");
-        oComboBox1.setTooltip("Country");
-        oComboBox1.setEditable(false)
-        oComboBox1.setValue("India");
-        oComboBox1.setWidth("200px")
-
-        var oItem = new ListItem("Country1");
-        oItem.setText("France");
-        oComboBox1.addItem(oItem);
-
-        oItem = new ListItem("Country2");
-        oItem.setText("India");
-        oComboBox1.addItem(oItem);
-
-        oItem = new ListItem("Country3");
-        oItem.setText("Japan");
-        oComboBox1.addItem(oItem);
-
-        oItem = new ListItem("Country4");
-        oItem.setText("China");
-        oComboBox1.addItem(oItem);
-
-        // oComboBox1.placeAt("content");
-
         try {
           /* Get user info */
           const { '@odata.context': context, ...oUser } = await $.get('/service/users/userInfo()');
 
+          //get user initials
+          oUser.initials = getInitials(oUser.username);
+          console.log(oUser);
           /* Set user info to model */
           const oModel = new JSONModel(oUser);
+
 
           /* Set user model to view */
           this.getView().setModel(oModel, 'user');
@@ -55,13 +42,14 @@ sap.ui.define(
 
           /* Set tile model to view */
           this.getView().setModel(oTiles, 'tiles');
+
         } catch (err) {
           console.error(err);
           MessageToast.show(err);
         }
       },
       onUserPanelPress: async function () {
-        MessageToast.show("user panel pressed")
+        MessageToast.show("user panel")
       },
       onLogoutPress: async function () {
         try {
@@ -71,9 +59,10 @@ sap.ui.define(
             dataType: 'json',
             data: JSON.stringify({ clearCookies: true }),
           });
-          
-          const win = window.open("http://localhost:4004/authentication/webapp/index.html", '_self');
-          win.focus();
+
+          //navigate to login
+          navigateTo("/authentication/webapp/index.html");
+
         } catch (err) {
           const errorMessage =
             err.responseJSON.message && typeof err.responseJSON.message === 'string'
@@ -90,21 +79,76 @@ sap.ui.define(
         const oTile = oEvent.getSource().getBindingContext('tiles').getObject();
 
         /* Set app url with tile information */
-        const sUrl = oTile.name + '/webapp/index.html';
+        const sUrl = '/' + oTile.name + '/webapp/index.html';
 
         /* Go to url */
-        $(location).attr('href', 'http://localhost:4004/' + sUrl); // window.location.href = 'http://localhost:4004/' + sUrl;
+        navigateTo(sUrl)
       },
       onPressSrvTile: function (oEvent) {
         /* Get pressed tile object */
         const oTile = oEvent.getSource().getBindingContext('tiles').getObject();
 
         /* Set service url with tile information */
-        const sUrl = 'service/products/' + oTile.url;
+        const sUrl = '/service/products/' + oTile.url;
 
         /* Go to url */
-        $(location).attr('href', 'http://localhost:4004/' + sUrl); // window.location.href = 'http://localhost:4004/' + sUrl;
+        navigateTo(sUrl)
       },
+      onPressAvatar: function () {
+        var oView = this.getView(),
+          oButton = oView.byId("userAvatar");
+
+        if (!this._oMenuFragment) {
+          this._oMenuFragment = Fragment.load({
+            id: oView.getId(),
+            name: "home.home.view.Menu",
+            controller: this
+          }).then(function (oMenu) {
+            oMenu.openBy(oButton);
+            this._oMenuFragment = oMenu;
+            return this._oMenuFragment;
+          }.bind(this));
+        } else {
+          this._oMenuFragment.openBy(oButton);
+        }
+      },
+      onMenuAction: function (oEvent) {
+        var oItem = oEvent.getParameter("item"),
+          sItemPath = "";
+
+        while (oItem instanceof MenuItem) {
+          sItemPath = oItem.getText() + " > " + sItemPath;
+          oItem = oItem.getParent();
+        }
+
+        sItemPath = sItemPath.substring(0, sItemPath.lastIndexOf(" > "));
+
+        //comment this
+        MessageToast.show("Action triggered on item: " + sItemPath);
+      }
     });
   }
 );
+
+//navigates to baseURl + url passed to the function
+function navigateTo(url) {
+  const baseURL = new URL(window.location.href).origin;
+  const win = window.open(`${baseURL}${url}`, '_self');
+  win.focus();
+}
+
+
+function getInitials(name) {
+  // Split the full name into an array of words.
+  const words = name.split(' ');
+
+  // Initialize the initials variable.
+  let initials = '';
+  // Loop through the words and get the first letter of each word.
+  for (let i = 0; i < words.length; i++) {
+    initials += words[i][0];
+    if (i == 1) break;
+  }
+  // Return the initials.
+  return initials.toUpperCase();
+}
