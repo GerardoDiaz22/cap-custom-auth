@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="UsersService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="Users" EntityType="UsersService.Users"/>
+                <EntitySet Name="RefreshTokens" EntityType="UsersService.RefreshTokens"/>
+                <EntitySet Name="Apps" EntityType="UsersService.Apps">
+                    <NavigationPropertyBinding Path="workstations" Target="WorkstationApps"/>
+                </EntitySet>
+                <EntitySet Name="WorkstationApps" EntityType="UsersService.WorkstationApps">
+                    <NavigationPropertyBinding Path="app" Target="Apps"/>
+                </EntitySet>
+                <FunctionImport Name="userInfo" Function="UsersService.userInfo"/>
+            </EntityContainer>
+            <EntityType Name="Users">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="username" Type="Edm.String"/>
+                <Property Name="email" Type="Edm.String"/>
+                <Property Name="password" Type="Edm.String"/>
+                <Property Name="roles" Type="Collection(Edm.String)" Nullable="false"/>
+                <Property Name="workstation" Type="Edm.Int32"/>
+            </EntityType>
+            <EntityType Name="RefreshTokens">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="token" Type="Edm.String"/>
+            </EntityType>
+            <EntityType Name="Apps">
+                <Key>
+                    <PropertyRef Name="appKey"/>
+                </Key>
+                <Property Name="appKey" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="name" Type="Edm.String"/>
+                <Property Name="status" Type="Edm.Boolean"/>
+                <NavigationProperty Name="workstations" Type="Collection(UsersService.WorkstationApps)" Partner="app"/>
+            </EntityType>
+            <EntityType Name="WorkstationApps">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="workstation" Type="Edm.Int32"/>
+                <NavigationProperty Name="app" Type="UsersService.Apps" Partner="workstations">
+                    <ReferentialConstraint Property="app_appKey" ReferencedProperty="appKey"/>
+                </NavigationProperty>
+                <Property Name="app_appKey" Type="Edm.Int32"/>
+            </EntityType>
+            <ComplexType Name="User">
+                <Property Name="id" Type="Edm.String"/>
+                <Property Name="username" Type="Edm.String"/>
+                <Property Name="roles" Type="Collection(Edm.String)" Nullable="false"/>
+                <Property Name="attr" Type="UsersService.Attributes"/>
+            </ComplexType>
+            <ComplexType Name="Attributes">
+                <Property Name="sociedades" Type="Collection(Edm.String)" Nullable="false"/>
+                <Property Name="centros" Type="Collection(Edm.String)" Nullable="false"/>
+                <Property Name="oficinas" Type="Collection(Edm.String)" Nullable="false"/>
+                <Property Name="apps" Type="Collection(Edm.String)" Nullable="false"/>
+            </ComplexType>
+            <Function Name="userInfo" IsBound="false" IsComposable="false">
+                <ReturnType Type="UsersService.User"/>
+            </Function>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

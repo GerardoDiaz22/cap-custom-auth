@@ -22,7 +22,7 @@
     "pg": "^8.10.0"
   },
   "devDependencies": {
-    "@sap/ux-specification": "^1.108.5",
+    "@sap/ux-specification": "^1.108.6",
     "sqlite3": "^5.0.4"
   },
   "scripts": {
@@ -64,7 +64,8 @@
     "app/sales",
     "app/authentication",
     "app/home",
-    "app/error"
+    "app/error",
+    "app/users-management"
   ],
   "cds": {
     "requires": {
