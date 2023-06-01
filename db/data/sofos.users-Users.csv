@@ -1,0 +1,3 @@
+username ;email ;password ;roles ;workstation
+Gerardo; gerardo@email.com; $2b$10$iLzsMFkmJW10XdFy8yP8Q.jeiNGDhJK6F7N0f4PEDB7ABbl5TJj4O; ["admin", "common"]; 100000
+Kevin; kevin@email.com; $2b$10$ZawRY93gtY7XWmmuhgwNaOmz9jT80eR.Kv2dOnX9EqMAoumhkVV1W; ["common"]; 100000

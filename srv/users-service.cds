@@ -3,6 +3,20 @@ using {sofos.users as my} from '../db/users-schema';
 @path: 'service/users'
 service UsersService @(requires: 'authenticated-user'){
 
+    entity Users @(restrict: [
+        {
+            grant: ['*'],
+            to   : ['admin']
+        }
+    ]) as projection on my.Users;
+
+    entity RefreshTokens @(restrict: [
+        {
+            grant: ['*'],
+            to   : ['admin']
+        }
+    ]) as projection on my.RefreshTokens;
+
     entity Apps @(restrict: [
         {
             grant: ['*'],

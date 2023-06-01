@@ -83,8 +83,8 @@ sap.ui.define(
         }
 
         // Create data object
-        const role = roleText === 'Administrator' ? 'admin' : 'common';
-        const data = { username, email, password, role, workstation, setCookies: false };
+        const roles = roleText === 'Administrator' ? ['admin'] : ['common'];
+        const data = { username, email, password, roles, workstation, setCookies: false };
 
         // Send POST request to API endpoint
         try {

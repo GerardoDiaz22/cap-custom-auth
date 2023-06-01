@@ -3,18 +3,7 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  database: process.env.POSTGRES_USERS_DB,
-  host: process.env.POSTGRES_HOST,
-  port: process.env.POSTGRES_PORT,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+const cds = require('@sap/cds');
 
 module.exports = function (passport) {
   // Local Strategy
@@ -26,25 +15,24 @@ module.exports = function (passport) {
         passwordField: 'password',
       },
       async (email, password, done) => {
-        const client = await pool.connect();
+        const srv = await cds.connect.to('UsersService');
+        const tx = srv.tx({ user: { roles: ['admin'] } });
         try {
           // Find the user associated with the email provided by the user
-          const user = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-          if (!user.rowCount) {
+          const user = await tx.run(SELECT.from('Users').where({ email }));
+          if (!user.length) {
             return done(null, false, { message: 'User not found' });
           }
           // Validate password and make sure it matches with the corresponding hash stored in the database
-          const validate = await bcrypt.compare(password, user.rows[0].password);
+          const validate = await bcrypt.compare(password, user[0].password);
           if (!validate) {
             return done(null, false, { message: 'Wrong Password' });
           }
-          return done(null, user.rows[0], {
-            message: 'Logged in Successfully',
-          });
-        } catch (error) {
-          return done(error, false, { message: 'Internal server error' });
-        } finally {
-          client.release();
+          await tx.commit();
+          return done(null, user[0], { message: 'Logged in Successfully' });
+        } catch (err) {
+          await tx.rollback();
+          return done(err, false, { message: 'Internal server error' });
         }
       }
     )
@@ -61,22 +49,21 @@ module.exports = function (passport) {
         ]),
         secretOrKey: process.env.ACCESS_TOKEN_SECRET,
       },
-      async (jwt_payload, done) => {
-        // jwt_payload is the token payload
-        const client = await pool.connect();
+      async (tokenPayload, done) => {
+        const srv = await cds.connect.to('UsersService');
+        const tx = srv.tx({ user: { roles: ['admin'] } });
         try {
           // Get the user from the database
-          const user = await client.query('SELECT * FROM users WHERE id = $1', [jwt_payload.id]);
+          const user = await tx.run(SELECT.from('Users').where({ ID: tokenPayload.ID }));
           // Check if the user exists
-          if (user.rowCount) {
-            return done(null, { user: user.rows[0], flag: false });
+          if (user.length) {
+            return done(null, { user: user[0], flag: false }, { message: 'Valid Token' });
           } else {
             return done(null, false, { message: 'User not found' });
           }
-        } catch (error) {
-          return done(error, false, { message: 'Internal server error' });
-        } finally {
-          client.release();
+        } catch (err) {
+          await tx.rollback();
+          return done(err, false, { message: 'Internal server error' });
         }
       }
     )
@@ -94,30 +81,31 @@ module.exports = function (passport) {
         secretOrKey: process.env.REFRESH_TOKEN_SECRET,
         passReqToCallback: true,
       },
-      async (req, jwt_payload, done) => {
-        // jwt_payload is the token payload
-        const client = await pool.connect();
+      async (req, tokenPayload, done) => {
+        const srv = await cds.connect.to('UsersService');
+        const tx = srv.tx({ user: { roles: ['admin'] } });
         try {
-          // Check if the refresh token is in the database
+          // Get the refresh token from the request
           const refreshToken = req.cookies.jwtRefreshToken || req.headers.authorization.split(' ')[1];
-          const validate = await client.query('SELECT * FROM refresh_tokens WHERE token = $1', [refreshToken]);
-          if (!validate.rowCount) {
+
+          // Check if the refresh token is valid
+          const validate = await tx.run(SELECT.from('RefreshTokens').where({ token: refreshToken }));
+          if (!validate.length) {
             return done(null, false, { message: 'Refresh Token Expired' });
           }
 
           // Get the user from the database
-          const user = await client.query('SELECT * FROM users WHERE id = $1', [jwt_payload.id]);
+          const user = await tx.run(SELECT.from('Users').where({ ID: tokenPayload.ID }));
 
           // Check if the user exists
-          if (user.rowCount) {
-            return done(null, { user: user.rows[0], flag: true });
+          if (user.length) {
+            return done(null, { user: user[0], flag: true }, { message: 'Valid Token' });
           } else {
             return done(null, false, { message: 'User not found' });
           }
-        } catch (error) {
-          return done(error, false, { message: 'Internal server error' });
-        } finally {
-          client.release();
+        } catch (err) {
+          await tx.rollback();
+          return done(err, false, { message: 'Internal server error' });
         }
       }
     )

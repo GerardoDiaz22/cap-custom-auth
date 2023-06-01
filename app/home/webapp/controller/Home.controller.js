@@ -36,12 +36,7 @@ sap.ui.define(
       },
       onLogoutPress: async function () {
         try {
-          await $.post({
-            url: '/logout',
-            contentType: 'application/json',
-            dataType: 'json',
-            data: JSON.stringify({ clearCookies: true }),
-          });
+          await $.delete('/logout');
           // TODO: look for a better way to do this redirect
           window.location.href = 'http://localhost:4004/authentication/webapp/index.html';
         } catch (err) {

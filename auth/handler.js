@@ -92,9 +92,9 @@ module.exports = async (req, res, next) => {
 
     // Fulfill the req.user contract for CDS
     req.user = new cds.User({
-      id: req.user.id,
+      id: req.user.ID,
       username: req.user.username,
-      roles: [req.user.role],
+      roles: req.user.roles,
       attr: userWorkstation,
     });
 

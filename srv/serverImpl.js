@@ -6,18 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  database: process.env.POSTGRES_USERS_DB,
-  host: process.env.POSTGRES_HOST,
-  port: process.env.POSTGRES_PORT,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+const cds = require('@sap/cds');
 
 const impl = async (app) => {
   // parse application/json
@@ -94,11 +83,11 @@ const impl = async (app) => {
 
         // Set user in request
         req.user = payload.user;
-        const id = payload.user.id;
+        const ID = payload.user.ID;
 
         // Set new access token if refresh token is valid
         if (payload.flag) {
-          const accessToken = generateAccessToken({ id });
+          const accessToken = generateAccessToken({ ID });
           res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
         }
 
@@ -131,111 +120,116 @@ const impl = async (app) => {
 
   // TODO: maybe i should make redirects from /login to the webapp login page
 
-  /* This should be a DELETE request, but we need to send the clearCookie option in the body */
-  app.post('/logout', async (req, res) => {
-    const client = await pool.connect();
+  /**
+   * This was a POST request, we needed to send the clearCookie option in the request body to clear the cookies on the client side (browser)
+   * but now it tries to always do it.
+   */
+  app.delete('/logout', async (req, res) => {
+    const srv = await cds.connect.to('UsersService');
+    const tx = srv.tx({ user: { roles: ['admin'] } });
     try {
-      const refreshToken = req.cookies.jwtRefreshToken;
-      await client.query('DELETE FROM refresh_tokens WHERE token = $1', [refreshToken]);
-      // Clear cookies if requested
-      if (req.body.clearCookies) {
-        res.clearCookie('jwtAccessToken');
-        res.clearCookie('jwtRefreshToken');
+      const refreshToken = req.cookies.jwtRefreshToken || null;
+      if (refreshToken) {
+        await tx.run(DELETE.from('RefreshTokens').where({ token: refreshToken }));
       }
+      await tx.commit();
+      res.clearCookie('jwtAccessToken');
+      res.clearCookie('jwtRefreshToken');
       return res.status(200).json({ message: 'Logged out successfully' });
     } catch (err) {
-      return res.status(500).json({ message: 'Unexpected error' });
-    } finally {
-      client.release();
+      await tx.rollback();
+      return res.status(500).json({ message: 'Internal Servel Error', error: err });
     }
   });
 
   app.post('/login', (req, res, next) => {
     passport.authenticate('login', { session: false }, async (err, user, info) => {
       if (err) {
-        const message = info.message || 'Unexpected error';
-        return res.status(500).json({ message });
+        return res.status(500).json({ message: info.message, error: err });
       }
 
       if (!user) {
-        const message = info.message || 'Login failed';
-        return res.status(401).json({ message });
+        return res.status(401).json({ message: info.message });
       }
 
-      const client = await pool.connect(); //TODO: check how to handle an error here
+      const srv = await cds.connect.to('UsersService');
+      const tx = srv.tx({ user: { roles: ['admin'] } });
       try {
-        // Get user from database
-        const result = await client.query('SELECT id FROM users WHERE email = $1', [user.email]);
         // Get user ID
-        const id = result.rows[0].id;
+        const ID = user.ID;
 
         // Generate access token
-        const accessToken = generateAccessToken({ id });
+        const accessToken = generateAccessToken({ ID });
 
         // Generate refresh token
-        const refreshToken = generateRefreshToken({ id }); // TODO: hash refrshtokens?
-        await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
+        const refreshToken = generateRefreshToken({ ID });
+        await tx.run(INSERT.into('RefreshTokens', { token: refreshToken }));
 
-        const message = info.message || 'Logged in Successful'; // TODO: think how to better handle this messages
+        // Close connection on success
+        await tx.commit();
 
-        // Set cookies if requested
+        // Set tokens as cookies if requested
         if (req.body.setCookies) {
           res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
           res.cookie('jwtRefreshToken', refreshToken, cookieOptions(90, 'days'));
-          return res.status(201).json({ message });
+          return res.status(201).json({ message: info.message });
         }
-        return res.status(201).json({ message, accessToken, refreshToken });
+        // Return tokens otherwise
+        return res.status(201).json({ message: info.message, accessToken, refreshToken });
       } catch (err) {
-        return res.status(500).json({ message: err });
-      } finally {
-        client.release();
+        await tx.rollback();
+        return res.status(500).json({ message: 'Internal Servel Error', error: err });
       }
     })(req, res, next);
   });
 
   app.post('/signup', async (req, res, next) => {
-    const client = await pool.connect();
+    const srv = await cds.connect.to('UsersService');
+    const tx = srv.tx({ user: { roles: ['admin'] } });
     try {
-      const { username, email, role, workstation, password } = req.body;
+      const { username, email, roles, workstation, password } = req.body;
+
+      // Look user up by email
+      const existingUser = await tx.run(SELECT.from('Users').where({ email }));
 
       // Check if user already exists
-      const existingUser = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-      if (existingUser.rowCount) {
-        const message = 'Email already exists';
-        return res.status(409).json({ message });
+      if (existingUser.length) {
+        return res.status(409).json({ message: 'Email already exists' });
       }
 
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Save user to database
-      const result = await client.query(
-        'INSERT INTO users (username, email, password, role, workstation) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-        [username, email, hashedPassword, role, workstation]
+      const createdUser = await tx.run(
+        INSERT.into('Users', { username, email, password: hashedPassword, roles, workstation })
       );
+
       // Get user ID
-      const id = result.rows[0];
+      const ID = createdUser.ID;
 
       // Generate access token
-      const accessToken = generateAccessToken({ id });
+      const accessToken = generateAccessToken({ ID });
 
       // Generate refresh token
-      const refreshToken = generateRefreshToken({ id });
-      await client.query('INSERT INTO refresh_tokens (token) VALUES ($1)', [refreshToken]);
+      const refreshToken = generateRefreshToken({ ID });
+      await tx.run(INSERT.into('RefreshTokens', { token: refreshToken }));
 
-      const message = 'Signup Successful';
+      // Close connection on success
+      await tx.commit();
 
-      // Set cookies if requested
+      // Set tokens as cookies if requested
       if (req.body.setCookies) {
         res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
         res.cookie('jwtRefreshToken', refreshToken, cookieOptions(90, 'days'));
-        return res.status(201).json({ message });
+        return res.status(201).json({ message: 'Signup Successful' });
       }
-      return res.status(201).json({ accessToken, refreshToken, message });
+      // Return tokens otherwise
+      return res.status(201).json({ message: 'Signup Successful', accessToken, refreshToken });
     } catch (err) {
-      return res.status(500).json({ message: err });
-    } finally {
-      client.release();
+      // Close connection on failure
+      await tx.rollback();
+      return res.status(500).json({ message: 'Internal Server Error', error: err });
     }
   });
 
@@ -245,8 +239,8 @@ const impl = async (app) => {
         const message = info.message || 'Invalid Token';
         return res.status(401).json({ message });
       }
-      const id = payload.user.id;
-      const accessToken = generateAccessToken({ id });
+      const ID = payload.user.id;
+      const accessToken = generateAccessToken({ ID });
       const message = info.message || 'Refresh Token Created Successfully'; // TODO: Not sure about this message
       return res.status(201).json({ message, accessToken });
     })(req, res, next);

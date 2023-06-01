@@ -5,6 +5,18 @@ using {
     cuid
 } from '@sap/cds/common';
 
+entity Users : cuid {
+    username    : String;
+    email       : String;
+    password    : String;
+    roles       : array of String;
+    workstation : Integer;
+}
+
+entity RefreshTokens : cuid {
+    token : String;
+}
+
 entity WorkstationApps : cuid {
     workstation : Integer;
     app         : Association to Apps;
