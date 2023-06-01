@@ -19,13 +19,17 @@ sap.ui.define(
         try {
           /* Get user info */
           const { '@odata.context': context, ...oUser } = await $.get('/service/users/userInfo()');
+          
+          //example user info
+          oUser.attr.centros = ["1001","1003"]
+          oUser.attr.sociedades = ["1001","1002"]
+          oUser.attr.oficinas = ["1001","1004"]
 
           //get user initials
           oUser.initials = getInitials(oUser.username);
-          console.log(oUser);
+          
           /* Set user info to model */
           const oModel = new JSONModel(oUser);
-
 
           /* Set user model to view */
           this.getView().setModel(oModel, 'user');
@@ -47,7 +51,7 @@ sap.ui.define(
           console.error(err);
           MessageToast.show(err);
         }
-        this.onUserInfoPress();
+        
       },
       onUserPanelPress: async function () {
         MessageToast.show("user panel")
@@ -144,7 +148,7 @@ sap.ui.define(
         sItemPath = sItemPath.substring(0, sItemPath.lastIndexOf(" > "));
 
         //comment this
-        MessageToast.show("Action triggered on item: " + sItemPath);
+        // MessageToast.show("Action triggered on item: " + sItemPath);
       },
       onCloseInfoBtnPress: function() {
         this._oInfoDialog.close();
