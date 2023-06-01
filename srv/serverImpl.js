@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
+const authRoutes = require('./auth-routes');
 
 const impl = async (app) => {
   // parse application/json
@@ -155,46 +156,7 @@ const impl = async (app) => {
     }
   });
 
-  app.post('/login', (req, res, next) => {
-    passport.authenticate('login', { session: false }, async (err, user, info) => {
-      if (err) {
-        return res.status(500).json({ message: info.message, error: err });
-      }
-
-      if (!user) {
-        return res.status(401).json({ message: info.message });
-      }
-
-      const srv = await cds.connect.to('UsersService');
-      const tx = srv.tx({ user: { roles: ['admin'] } });
-      try {
-        // Get user ID
-        const ID = user.ID;
-
-        // Generate access token
-        const accessToken = generateAccessToken({ ID });
-
-        // Generate refresh token
-        const refreshToken = generateRefreshToken({ ID });
-        await tx.run(INSERT.into('RefreshTokens', { token: refreshToken }));
-
-        // Close connection on success
-        await tx.commit();
-
-        // Set tokens as cookies if requested
-        if (req.body.setCookies) {
-          res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
-          res.cookie('jwtRefreshToken', refreshToken, cookieOptions(90, 'days'));
-          return res.status(201).json({ message: info.message });
-        }
-        // Return tokens otherwise
-        return res.status(201).json({ message: info.message, accessToken, refreshToken });
-      } catch (err) {
-        await tx.rollback();
-        return res.status(500).json({ message: 'Internal Servel Error', error: err });
-      }
-    })(req, res, next);
-  });
+  app.use('/', authRoutes);
 
   app.post('/signup', async (req, res, next) => {
     const srv = await cds.connect.to('UsersService');
@@ -207,6 +169,7 @@ const impl = async (app) => {
 
       // Check if user already exists
       if (existingUser.length) {
+        await tx.rollback();
         return res.status(409).json({ message: 'Email already exists' });
       }
 
@@ -230,7 +193,6 @@ const impl = async (app) => {
 
       // Close connection on success
       await tx.commit();
-
       // Set tokens as cookies if requested
       if (req.body.setCookies) {
         res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
@@ -250,11 +212,13 @@ const impl = async (app) => {
     passport.authenticate(['jwtRefresh'], (err, payload, info) => {
       if (err || !payload) {
         const message = info.message || 'Invalid Token';
+        // await tx.rollback();
         return res.status(401).json({ message });
       }
       const ID = payload.user.id;
       const accessToken = generateAccessToken({ ID });
       const message = info.message || 'Refresh Token Created Successfully'; // TODO: Not sure about this message
+      // await tx.commit();
       return res.status(201).json({ message, accessToken });
     })(req, res, next);
   });

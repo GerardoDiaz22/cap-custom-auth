@@ -21,11 +21,13 @@ module.exports = function (passport) {
           // Find the user associated with the email provided by the user
           const user = await tx.run(SELECT.from('Users').where({ email }));
           if (!user.length) {
+            await tx.rollback();
             return done(null, false, { message: 'User not found' });
           }
           // Validate password and make sure it matches with the corresponding hash stored in the database
           const validate = await bcrypt.compare(password, user[0].password);
           if (!validate) {
+            await tx.rollback();
             return done(null, false, { message: 'Wrong Password' });
           }
           await tx.commit();
@@ -57,8 +59,10 @@ module.exports = function (passport) {
           const user = await tx.run(SELECT.from('Users').where({ ID: tokenPayload.ID }));
           // Check if the user exists
           if (user.length) {
+            await tx.commit();
             return done(null, { user: user[0], flag: false }, { message: 'Valid Token' });
           } else {
+            await tx.rollback();
             return done(null, false, { message: 'User not found' });
           }
         } catch (err) {
@@ -91,6 +95,7 @@ module.exports = function (passport) {
           // Check if the refresh token is valid
           const validate = await tx.run(SELECT.from('RefreshTokens').where({ token: refreshToken }));
           if (!validate.length) {
+            await tx.rollback();
             return done(null, false, { message: 'Refresh Token Expired' });
           }
 
@@ -99,8 +104,10 @@ module.exports = function (passport) {
 
           // Check if the user exists
           if (user.length) {
+            await tx.commit();
             return done(null, { user: user[0], flag: true }, { message: 'Valid Token' });
           } else {
+            await tx.rollback();
             return done(null, false, { message: 'User not found' });
           }
         } catch (err) {
