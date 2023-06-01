@@ -53,11 +53,11 @@ sap.ui.define(
       },
       onLogoutPress: async function () {
         try {
-          await $.post({
+          /* Send DELETE request */
+          await $.ajax({
             url: '/logout',
-            contentType: 'application/json',
+            type: 'DELETE',
             dataType: 'json',
-            data: JSON.stringify({ clearCookies: true }),
           });
 
           //navigate to login
