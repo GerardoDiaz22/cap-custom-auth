@@ -7,7 +7,6 @@
   "private": true,
   "dependencies": {
     "@sap/cds": "^6",
-    "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
     "cds-dbm": "^0.1.4",
     "cds-pg": "^0.1.36",
@@ -28,7 +27,6 @@
   },
   "scripts": {
     "start": "cds run",
-    "deploy:auth": "node ./db/users-db-init.js",
     "deploy:pg": "npx cds-dbm deploy --create-db --load-via delta",
     "deploy:pg:clean": "npx cds-dbm deploy --create-db --auto-undeploy --load-via full",
     "load:pg": "npx cds-dbm load --via delta"
