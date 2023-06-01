@@ -57,7 +57,7 @@
                     </GenericTile>
                 </f:items>
             </f:GridContainer>
-            <Title id="servicesTitle" text="Services" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
+            <!-- <Title id="servicesTitle" text="Services" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
             <f:GridContainer id="gridContainerSrv" class="sapUiMediumMarginBegin" items="{tiles>/services}">
                 <f:layout>
                     <f:GridContainerSettings id="gridSettingStandardSrv" rowSize="5rem" columnSize="5rem" gap="1rem" />
@@ -75,7 +75,7 @@
                         </layoutData>
                     </GenericTile>
                 </f:items>
-            </f:GridContainer>
+            </f:GridContainer> -->
         </content>
     </Page>
 </mvc:View>
