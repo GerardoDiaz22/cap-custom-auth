@@ -1,103 +1,28 @@
 require('dotenv').config();
 const express = require('express');
 const passport = require('passport');
-const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
-const authRoutes = require('./auth-routes');
+const { router: authRoutes, requireAuthentication } = require('./auth-routes');
 
 const impl = async (app) => {
-  // parse application/json
+  /* Parse application/json */
   app.use(express.json());
 
-  // parse application/x-www-form-urlencoded
-  app.use(express.urlencoded({ extended: false }));
-
-  // parse cookies
+  /* Parse cookies */
   app.use(cookieParser());
 
-  // initialize passport
+  /* Initialize passport */
   app.use(passport.initialize());
 
-  // include passport strategies
+  /* Include passport strategies */
   require('../auth/passport')(passport);
 
-  // set static folder
+  /* Set static folder */
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
-  const cookieOptions = (time, unit) => {
-    const millisPerUnit = {
-      seconds: 1000,
-      minutes: 60 * 1000,
-      hours: 60 * 60 * 1000,
-      days: 24 * 60 * 60 * 1000,
-    };
-
-    const maxAge = time * millisPerUnit[unit];
-
-    return {
-      maxAge,
-      httpOnly: true,
-      /*
-      secure: false,    // allows the cookie to be sent over an insecure HTTP connection (localhost)
-      sameSite: 'none', // allows the cookie to be sent in cross-site requests
-      */
-    };
-  };
-
-  const generateAccessToken = (user) => {
-    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
-    });
-  };
-
-  const generateRefreshToken = (user) => {
-    return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
-    });
-  };
-
-  const requireAuthentication =
-    ({ goToLoginOnUnauth = false, goToHomeOnAuth = false } = {}) =>
-    (req, res, next) => {
-      passport.authenticate(['jwtAccess', 'jwtRefresh'], (err, payload, info) => {
-        if (err || !payload) {
-          // Go to login page if unauthenticated
-          if (goToLoginOnUnauth) {
-            return res.redirect('/authentication/webapp/index.html');
-          }
-          // If already on login or error page, go to next middleware FIXME: There should be a cleaner way to do this
-          if (req.originalUrl.startsWith('/authentication/webapp/') || req.originalUrl.startsWith('/error/webapp/')) {
-            return next();
-          }
-          // Go to error page
-          const errorMessage = info?.message || 'Token not found or invalid';
-          const statusCode = info?.statusCode || 401;
-          return res.redirect(
-            `/error?statusCode=${encodeURIComponent(statusCode)}&message=${encodeURIComponent(errorMessage)}`
-          );
-        }
-
-        // Set user in request
-        req.user = payload.user;
-        const ID = payload.user.ID;
-
-        // Set new access token if refresh token is valid
-        if (payload.flag) {
-          const accessToken = generateAccessToken({ ID });
-          res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
-        }
-
-        // Go to home page if authenticated
-        if (goToHomeOnAuth) {
-          return res.redirect('/');
-        }
-        // Go to next middleware
-        return next();
-      })(req, res, next);
-    };
-
+  /* Helper functions */
   const getDirs = async (directory) => {
     return new Promise((resolve, reject) => {
       const directoryPath = path.join(__dirname, '..', directory);
@@ -112,6 +37,7 @@ const impl = async (app) => {
     });
   };
 
+  /* Logging */
   app.use((req, res, next) => {
     console.log(req.method, '-', req.url);
     return next();
@@ -128,6 +54,7 @@ const impl = async (app) => {
     );
   });
 
+  /* Authentication Routes */
   app.use('/', authRoutes);
 
   /* Only Unauthenticated -> redirects to Home */

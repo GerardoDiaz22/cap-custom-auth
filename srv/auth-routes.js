@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cds = require('@sap/cds');
 const passport = require('passport');
@@ -36,6 +37,46 @@ const generateRefreshToken = (user) => {
     expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
   });
 };
+
+const requireAuthentication =
+  ({ goToLoginOnUnauth = false, goToHomeOnAuth = false } = {}) =>
+  (req, res, next) => {
+    passport.authenticate(['jwtAccess', 'jwtRefresh'], (err, payload, info) => {
+      if (err || !payload) {
+        // Go to login page if unauthenticated
+        if (goToLoginOnUnauth) {
+          return res.redirect('/authentication/webapp/index.html');
+        }
+        // If already on login or error page, go to next middleware FIXME: There should be a cleaner way to do this
+        if (req.originalUrl.startsWith('/authentication/webapp/') || req.originalUrl.startsWith('/error/webapp/')) {
+          return next();
+        }
+        // Go to error page
+        const errorMessage = info?.message || 'Token not found or invalid';
+        const statusCode = info?.statusCode || 401;
+        return res.redirect(
+          `/error?statusCode=${encodeURIComponent(statusCode)}&message=${encodeURIComponent(errorMessage)}`
+        );
+      }
+
+      // Set user in request
+      req.user = payload.user;
+      const ID = payload.user.ID;
+
+      // Set new access token if refresh token is valid
+      if (payload.flag) {
+        const accessToken = generateAccessToken({ ID });
+        res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
+      }
+
+      // Go to home page if authenticated
+      if (goToHomeOnAuth) {
+        return res.redirect('/');
+      }
+      // Go to next middleware
+      return next();
+    })(req, res, next);
+  };
 
 /**
  * This was a POST request, we needed to send the clearCookie option in the request body to clear the cookies on the client side (browser)
@@ -150,4 +191,4 @@ router.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
-module.exports = router;
+module.exports = { router, requireAuthentication };
