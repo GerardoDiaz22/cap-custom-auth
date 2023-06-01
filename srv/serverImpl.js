@@ -1,9 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const cds = require('@sap/cds');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
@@ -42,7 +40,7 @@ const impl = async (app) => {
       maxAge,
       httpOnly: true,
       /*
-      secure: false, // allows the cookie to be sent over an insecure HTTP connection (localhost)
+      secure: false,    // allows the cookie to be sent over an insecure HTTP connection (localhost)
       sameSite: 'none', // allows the cookie to be sent in cross-site requests
       */
     };
@@ -100,11 +98,6 @@ const impl = async (app) => {
       })(req, res, next);
     };
 
-  const logRequest = (req, res, next) => {
-    console.log(req.method, '-', req.url);
-    return next();
-  };
-
   const getDirs = async (directory) => {
     return new Promise((resolve, reject) => {
       const directoryPath = path.join(__dirname, '..', directory);
@@ -119,7 +112,10 @@ const impl = async (app) => {
     });
   };
 
-  app.use(logRequest);
+  app.use((req, res, next) => {
+    console.log(req.method, '-', req.url);
+    return next();
+  });
 
   /* Always Unprotected */
   app.get('/error', (req, res, next) => {
@@ -132,96 +128,7 @@ const impl = async (app) => {
     );
   });
 
-  // TODO: maybe i should make redirects from /login to the webapp login page
-
-  /**
-   * This was a POST request, we needed to send the clearCookie option in the request body to clear the cookies on the client side (browser)
-   * but now it tries to always do it.
-   */
-  app.delete('/logout', async (req, res) => {
-    const srv = await cds.connect.to('UsersService');
-    const tx = srv.tx({ user: { roles: ['admin'] } });
-    try {
-      const refreshToken = req.cookies.jwtRefreshToken || null;
-      if (refreshToken) {
-        await tx.run(DELETE.from('RefreshTokens').where({ token: refreshToken }));
-      }
-      await tx.commit();
-      res.clearCookie('jwtAccessToken');
-      res.clearCookie('jwtRefreshToken');
-      return res.status(200).json({ message: 'Logged out successfully' });
-    } catch (err) {
-      await tx.rollback();
-      return res.status(500).json({ message: 'Internal Servel Error', error: err });
-    }
-  });
-
   app.use('/', authRoutes);
-
-  app.post('/signup', async (req, res, next) => {
-    const srv = await cds.connect.to('UsersService');
-    const tx = srv.tx({ user: { roles: ['admin'] } });
-    try {
-      const { username, email, roles, workstation, password } = req.body;
-
-      // Look user up by email
-      const existingUser = await tx.run(SELECT.from('Users').where({ email }));
-
-      // Check if user already exists
-      if (existingUser.length) {
-        await tx.rollback();
-        return res.status(409).json({ message: 'Email already exists' });
-      }
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Save user to database
-      const createdUser = await tx.run(
-        INSERT.into('Users', { username, email, password: hashedPassword, roles, workstation })
-      );
-
-      // Get user ID
-      const ID = createdUser.ID;
-
-      // Generate access token
-      const accessToken = generateAccessToken({ ID });
-
-      // Generate refresh token
-      const refreshToken = generateRefreshToken({ ID });
-      await tx.run(INSERT.into('RefreshTokens', { token: refreshToken }));
-
-      // Close connection on success
-      await tx.commit();
-      // Set tokens as cookies if requested
-      if (req.body.setCookies) {
-        res.cookie('jwtAccessToken', accessToken, cookieOptions(1, 'hours'));
-        res.cookie('jwtRefreshToken', refreshToken, cookieOptions(90, 'days'));
-        return res.status(201).json({ message: 'Signup Successful' });
-      }
-      // Return tokens otherwise
-      return res.status(201).json({ message: 'Signup Successful', accessToken, refreshToken });
-    } catch (err) {
-      // Close connection on failure
-      await tx.rollback();
-      return res.status(500).json({ message: 'Internal Server Error', error: err });
-    }
-  });
-
-  app.post('/token', async (req, res, next) => {
-    passport.authenticate(['jwtRefresh'], (err, payload, info) => {
-      if (err || !payload) {
-        const message = info.message || 'Invalid Token';
-        // await tx.rollback();
-        return res.status(401).json({ message });
-      }
-      const ID = payload.user.id;
-      const accessToken = generateAccessToken({ ID });
-      const message = info.message || 'Refresh Token Created Successfully'; // TODO: Not sure about this message
-      // await tx.commit();
-      return res.status(201).json({ message, accessToken });
-    })(req, res, next);
-  });
 
   /* Only Unauthenticated -> redirects to Home */
   app.get('/authentication/webapp/*', requireAuthentication({ goToHomeOnAuth: true }));
