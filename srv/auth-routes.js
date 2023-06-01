@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 
+/* Helper functions */
 const cookieOptions = (time, unit) => {
   const millisPerUnit = {
     seconds: 1000,
@@ -77,6 +78,8 @@ const requireAuthentication =
       return next();
     })(req, res, next);
   };
+
+/* Routes */
 
 /**
  * This was a POST request, we needed to send the clearCookie option in the request body to clear the cookies on the client side (browser)
