@@ -36,14 +36,14 @@ sap.ui.define(
       },
       onLogoutPress: async function () {
         try {
+          /* Send DELETE request */
           await $.ajax({
             url: '/logout',
             type: 'DELETE',
             dataType: 'json',
           });
-
-          // TODO: look for a better way to do this redirect
-          window.location.href = 'http://localhost:4004/authentication/webapp/index.html';
+          /* Navigate to login page */
+          $(location).attr('href', 'http://localhost:4004/authentication/webapp/index.html');
         } catch (err) {
           const errorMessage =
             err.responseJSON.message && typeof err.responseJSON.message === 'string'
@@ -62,8 +62,8 @@ sap.ui.define(
         /* Set app url with tile information */
         const sUrl = oTile.name + '/webapp/index.html';
 
-        /* Go to url */
-        $(location).attr('href', 'http://localhost:4004/' + sUrl); // window.location.href = 'http://localhost:4004/' + sUrl;
+        /* Navigate to tile */
+        $(location).attr('href', 'http://localhost:4004/' + sUrl);
       },
       onPressSrvTile: function (oEvent) {
         /* Get pressed tile object */
@@ -72,8 +72,8 @@ sap.ui.define(
         /* Set service url with tile information */
         const sUrl = 'service/products/' + oTile.url;
 
-        /* Go to url */
-        $(location).attr('href', 'http://localhost:4004/' + sUrl); // window.location.href = 'http://localhost:4004/' + sUrl;
+        /* Navigate to tile */
+        $(location).attr('href', 'http://localhost:4004/' + sUrl);
       },
     });
   }
