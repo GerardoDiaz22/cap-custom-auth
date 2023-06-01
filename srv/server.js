@@ -1,5 +1,5 @@
 const cds = require('@sap/cds');
-const { impl } = require('./serverImpl');
+const { impl } = require('./server-impl');
 
 cds.on('bootstrap', async (app) => await impl(app));
 
