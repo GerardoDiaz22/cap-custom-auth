@@ -1,11 +1,27 @@
 <mvc:View
     controllerName="home.home.controller.Home"
-    displayBlock="true"
+     displayBlock="true"
     xmlns:layout="sap.ui.layout" 
     xmlns:mvc="sap.ui.core.mvc" 
     xmlns="sap.m"
     xmlns:f="sap.f">
-    <Page id="page" title="{i18n>title}" showHeader="false">
+    <f:ShellBar
+        id="shellbar"
+			title="Home"
+			secondTitle=""
+			homeIcon="sap-icon://home"
+			showCopilot="false"
+			showSearch="false"
+			showNotifications="false"
+			showProductSwitcher="false"
+			notificationsNumber="0">
+		
+		<f:profile>
+			<Avatar id="userAvatar" initials="{ path: 'user>/initials', targetType: 'any' }" press="onPressAvatar" ariaHasPopup="Menu" />
+		</f:profile>
+
+	</f:ShellBar>
+    <Page id="page" class="pageContainer" title="{i18n>title}" showHeader="false">
         <content>
             <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTop">
                 <Panel id="homePanel" class="shadow" width="300px" height="125px">
@@ -13,6 +29,7 @@
                     <VBox id="subPanelLayout" alignItems="Center">
                         <HBox id="userInfo" class="sapUiTinyMarginBottom">
                             <Title  id="usernameText" text="{ path: 'user>/username', targetType: 'any' }"/>
+                            <Title  id="userInitialsText" text="{ path: 'initials>/initials', targetType: 'any' }"/>
                             <Label id="userSeparator" text="-" class="sapUiTinyMarginBeginEnd"/>
                             <Title  id="rolesText" text="{ path: 'user>/roles', targetType: 'any', formatter: '.formatRoles' }"/>
                         </HBox>
