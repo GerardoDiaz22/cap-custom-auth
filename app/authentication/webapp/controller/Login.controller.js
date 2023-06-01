@@ -58,7 +58,7 @@ sap.ui.define(
             dataType: 'json',
           });
           // Navigate to home page
-          window.location.href = 'http://localhost:4004/'; // TODO: think of a better way to do this
+          $(location).attr('href', 'http://localhost:4004/');
         } catch (err) {
           const errorMessage =
             err.responseJSON.message && typeof err.responseJSON.message === 'string'
