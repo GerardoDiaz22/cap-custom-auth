@@ -1,0 +1,16 @@
+<core:FragmentDefinition
+		xmlns="sap.m"
+		xmlns:core="sap.ui.core">
+	<Dialog id="infoDialog" title="user information">
+        <content >
+            <FlexBox id="dialogLayouy" direction="Column" alignItems="End" class="sapUiSmallMarginEnd" >
+                <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTop" width="100%">
+                    <Title  id="usernameText" text="{ path: 'user>/username', targetType: 'any' }"/>
+                    <Label  id="rolesText" text="{ path: 'user>/roles', targetType: 'any', formatter: '.formatRoles' }"/>
+                    <Text  id="centros" text="{ path: 'user>/attr>/centros', targetType: 'any' }"/>
+                </VBox>
+                <Button id="closeInfoBtn" text="close" class="logoutBtn" press="onCloseInfoBtnPress" />
+            </FlexBox>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

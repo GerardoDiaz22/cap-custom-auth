@@ -12,7 +12,7 @@
 				<MenuItem text="Other"/>
 			</items>
 		</MenuItem>
-		<MenuItem text="User Information"/>
+		<MenuItem press="onUserInfoPress" text="User Information"/>
 		<MenuItem press="onLogoutPress" text="Log out"/>
 	</Menu>
 </core:FragmentDefinition>

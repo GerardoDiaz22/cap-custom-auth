@@ -47,6 +47,7 @@ sap.ui.define(
           console.error(err);
           MessageToast.show(err);
         }
+        this.onUserInfoPress();
       },
       onUserPanelPress: async function () {
         MessageToast.show("user panel")
@@ -112,6 +113,25 @@ sap.ui.define(
           this._oMenuFragment.openBy(oButton);
         }
       },
+      onUserInfoPress: function () {
+        var oView = this.getView(),
+          oButton = oView.byId("userAvatar");
+
+        if (!this._oInfoDialog) {
+          Fragment.load({
+            id: oView.getId(),
+            name: "home.home.view.InfoDialog",
+            controller: this
+          }).then(function (dialog) {
+            this.getView().addDependent(dialog)
+            dialog .open();
+            this._oInfoDialog = dialog
+            return dialog;
+          }.bind(this));
+        }else{
+          this._oInfoDialog.open();
+        }
+      },
       onMenuAction: function (oEvent) {
         var oItem = oEvent.getParameter("item"),
           sItemPath = "";
@@ -125,6 +145,9 @@ sap.ui.define(
 
         //comment this
         MessageToast.show("Action triggered on item: " + sItemPath);
+      },
+      onCloseInfoBtnPress: function() {
+        this._oInfoDialog.close();
       }
     });
   }

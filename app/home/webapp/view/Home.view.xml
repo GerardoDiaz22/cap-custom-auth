@@ -23,7 +23,7 @@
 	</f:ShellBar>
     <Page id="page" class="pageContainer" title="{i18n>title}" showHeader="false">
         <content>
-            <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTop">
+            <!-- <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTop">
                 <Panel id="homePanel" class="shadow" width="300px" height="125px">
                     <FlexBox id="panelLayout" height="100%" alignItems="Center" justifyContent="Center">
                     <VBox id="subPanelLayout" alignItems="Center">
@@ -37,7 +37,7 @@
                     </VBox>
                     </FlexBox> 
                 </Panel>
-            </VBox>
+            </VBox> -->
             <Title id="appsTitle" text="Applications" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
             <f:GridContainer id="gridContainerApp" class="sapUiMediumMarginBegin" items="{tiles>/apps}">
                 <f:layout>
