@@ -1,0 +1,27 @@
+<core:FragmentDefinition
+		xmlns="sap.m"
+		xmlns:core="sap.ui.core">
+	<Dialog id="infoDialog" title="user information">
+        <content >
+            <FlexBox id="dialogLayouy" direction="Column" alignItems="End" class="sapUiSmallMargin" >
+                <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTopBottom" width="100%">
+                    <Title  id="usernameText" text="{ path: 'user>/username', targetType: 'any' }"/>
+                        <Label  id="rolesText" text="{ path: 'user>/roles', targetType: 'any', formatter: '.formatRoles' }"/>
+                        <FlexBox id="userCentros" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" width="100%">
+                            <Text id="userCentrosText" text="Centros: "></Text>
+                            <Text  id="centros" text="{ path: 'user>/attr/centros', targetType: 'any' }"/>
+                        </FlexBox>
+                        <FlexBox id="userSociedades" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" width="100%">
+                            <Text id="userSociedadesText" text="Sociedades: "></Text>
+                            <Text  id="Sociedades" text="{ path: 'user>/attr/sociedades', targetType: 'any' }"/>
+                        </FlexBox>
+                        <FlexBox id="userOficinas" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" width="100%">
+                            <Text id="userOficinasText" text="Oficinas: "></Text>
+                            <Text  id="Oficinas" text="{ path: 'user>/attr/oficinas', targetType: 'any' }"/>
+                        </FlexBox>
+                </VBox>
+                <Button id="closeInfoBtn" text="close" press="onCloseInfoBtnPress" />
+            </FlexBox>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

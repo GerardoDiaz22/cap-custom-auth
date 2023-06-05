@@ -1,18 +1,35 @@
 <mvc:View
     controllerName="home.home.controller.Home"
-    displayBlock="true"
+     displayBlock="true"
     xmlns:layout="sap.ui.layout" 
     xmlns:mvc="sap.ui.core.mvc" 
     xmlns="sap.m"
     xmlns:f="sap.f">
-    <Page id="page" title="{i18n>title}" showHeader="false">
+    <f:ShellBar
+        id="shellbar"
+			title="Home"
+			secondTitle=""
+			homeIcon="sap-icon://home"
+			showCopilot="false"
+			showSearch="false"
+			showNotifications="false"
+			showProductSwitcher="false"
+			notificationsNumber="0">
+		
+		<f:profile>
+			<Avatar id="userAvatar" initials="{ path: 'user>/initials', targetType: 'any' }" press="onPressAvatar" ariaHasPopup="Menu" />
+		</f:profile>
+
+	</f:ShellBar>
+    <Page id="page" class="pageContainer" title="{i18n>title}" showHeader="false">
         <content>
-            <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTop">
+            <!-- <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTop">
                 <Panel id="homePanel" class="shadow" width="300px" height="125px">
                     <FlexBox id="panelLayout" height="100%" alignItems="Center" justifyContent="Center">
                     <VBox id="subPanelLayout" alignItems="Center">
                         <HBox id="userInfo" class="sapUiTinyMarginBottom">
                             <Title  id="usernameText" text="{ path: 'user>/username', targetType: 'any' }"/>
+                            <Title  id="userInitialsText" text="{ path: 'initials>/initials', targetType: 'any' }"/>
                             <Label id="userSeparator" text="-" class="sapUiTinyMarginBeginEnd"/>
                             <Title  id="rolesText" text="{ path: 'user>/roles', targetType: 'any', formatter: '.formatRoles' }"/>
                         </HBox>
@@ -20,7 +37,7 @@
                     </VBox>
                     </FlexBox> 
                 </Panel>
-            </VBox>
+            </VBox> -->
             <Title id="appsTitle" text="Applications" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
             <f:GridContainer id="gridContainerApp" class="sapUiMediumMarginBegin" items="{tiles>/apps}">
                 <f:layout>
@@ -40,7 +57,7 @@
                     </GenericTile>
                 </f:items>
             </f:GridContainer>
-            <Title id="servicesTitle" text="Services" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
+            <!-- <Title id="servicesTitle" text="Services" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
             <f:GridContainer id="gridContainerSrv" class="sapUiMediumMarginBegin" items="{tiles>/services}">
                 <f:layout>
                     <f:GridContainerSettings id="gridSettingStandardSrv" rowSize="5rem" columnSize="5rem" gap="1rem" />
@@ -58,7 +75,7 @@
                         </layoutData>
                     </GenericTile>
                 </f:items>
-            </f:GridContainer>
+            </f:GridContainer> -->
         </content>
     </Page>
 </mvc:View>
