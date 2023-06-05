@@ -7,15 +7,16 @@
                 <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTopBottom" width="100%">
                     <Title  id="usernameText" text="{ path: 'user>/username', targetType: 'any' }"/>
                         <Label  id="rolesText" text="{ path: 'user>/roles', targetType: 'any', formatter: '.formatRoles' }"/>
-                        <FlexBox id="userCentros" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" width="100%">
+                        <FlexBox id="userCentros" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" alignItems="Center" width="100%" height="25px">
                             <Text id="userCentrosText" text="Centros: "></Text>
                             <Text  id="centros" text="{ path: 'user>/attr/centros', targetType: 'any' }"/>
+                            <Button id="showCentrosBtn" text="Mostrar" press="onShowCentrosPress" visible="false"></Button>
                         </FlexBox>
-                        <FlexBox id="userSociedades" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" width="100%">
+                        <FlexBox id="userSociedades" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" alignItems="Center" width="100%">
                             <Text id="userSociedadesText" text="Sociedades: "></Text>
                             <Text  id="Sociedades" text="{ path: 'user>/attr/sociedades', targetType: 'any' }"/>
                         </FlexBox>
-                        <FlexBox id="userOficinas" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" width="100%">
+                        <FlexBox id="userOficinas" class="sapUiSmallMarginTopBottom" justifyContent="SpaceBetween" alignItems="Center" width="100%">
                             <Text id="userOficinasText" text="Oficinas: "></Text>
                             <Text  id="Oficinas" text="{ path: 'user>/attr/oficinas', targetType: 'any' }"/>
                         </FlexBox>

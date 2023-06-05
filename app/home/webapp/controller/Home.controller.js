@@ -3,7 +3,8 @@ sap.ui.define(
     'sap/ui/model/json/JSONModel',
     'sap/m/MessageToast',
     'sap/ui/core/Fragment',
-    'sap/m/MenuItem'],
+    'sap/m/MenuItem',
+    'sap/m/Button'],
   /**
    * @param {typeof sap.ui.core.mvc.Controller} Controller
    */
@@ -11,7 +12,8 @@ sap.ui.define(
     JSONModel,
     MessageToast,
     Fragment,
-    MenuItem) {
+    MenuItem,
+    Button) {
     'use strict';
 
     return Controller.extend('home.home.controller.Home', {
@@ -21,12 +23,15 @@ sap.ui.define(
           const { '@odata.context': context, ...oUser } = await $.get('/service/users/userInfo()');
           
           //example user info
-          oUser.attr.centros = ["1001","1003"]
+          oUser.attr.centros = ["1001","1003", "1112"]
           oUser.attr.sociedades = ["1001","1002"]
           oUser.attr.oficinas = ["1001","1004"]
 
           //get user initials
           oUser.initials = getInitials(oUser.username);
+
+          //userInfo
+          this._oUser = oUser; 
           
           /* Set user info to model */
           const oModel = new JSONModel(oUser);
@@ -51,7 +56,7 @@ sap.ui.define(
           console.error(err);
           MessageToast.show(err);
         }
-        
+        this.onUserInfoPress();
       },
       onUserPanelPress: async function () {
         MessageToast.show("user panel")
@@ -118,22 +123,54 @@ sap.ui.define(
         }
       },
       onUserInfoPress: function () {
-        var oView = this.getView(),
-          oButton = oView.byId("userAvatar");
-
+        
+        console.log(this._oUser.attr.centros);
+        const oView = this.getView();
+        console.log(this)
+        //load dialog
         if (!this._oInfoDialog) {
           Fragment.load({
             id: oView.getId(),
             name: "home.home.view.InfoDialog",
             controller: this
           }).then(function (dialog) {
-            this.getView().addDependent(dialog)
+
+            //if centros are more than 2 edit dialog to have ver todos btn
+            if(this._oUser.attr.centros.length > 2){
+              const centros = oView.byId("centros");
+              centros.setVisible(false);
+              const showCentrosBtn = oView.byId("showCentrosBtn");
+              showCentrosBtn.setVisible(true);
+            }
+
+            //open and save dialog
+            oView.addDependent(dialog)
             dialog .open();
             this._oInfoDialog = dialog
-            return dialog;
+            return dialog; //idk what does this line
           }.bind(this));
         }else{
+          //open dialog
           this._oInfoDialog.open();
+        }
+      },
+      onShowCentrosPress: function (oE){
+        const oView = this.getView();
+        if(!this._oShowCentrosDialog){
+          Fragment.load({
+            id: oView.getId(),
+            name: "home.home.view.ShowCentrosDialog",
+            controller: this
+          }).then( function ( dialog) {
+            //open and save dialog
+            oView.addDependent(dialog)
+            dialog.open()
+            this._oShowCentrosDialog = dialog
+            return dialog; //idk what does this line
+          }.bind(this))
+        }else{
+          //open dialog
+          this._oShowCentrosDialog.open();
         }
       },
       onMenuAction: function (oEvent) {

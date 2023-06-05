@@ -58,7 +58,8 @@ sap.ui.define(
             dataType: 'json',
           });
           // Navigate to home page
-          window.location.href = 'http://localhost:4004/'; // TODO: think of a better way to do this
+          //window.location.href = 'http://localhost:4004/'; // TODO: think of a better way to do this
+          navigateTo("/home/webapp/index.html")
         } catch (err) {
           const errorMessage =
             err.responseJSON.message && typeof err.responseJSON.message === 'string'
@@ -74,3 +75,10 @@ sap.ui.define(
     });
   }
 );
+
+//navigates to baseURl + url passed to the function
+function navigateTo(url) {
+  const baseURL = new URL(window.location.href).origin;
+  const win = window.open(`${baseURL}${url}`, '_self');
+  win.focus();
+}

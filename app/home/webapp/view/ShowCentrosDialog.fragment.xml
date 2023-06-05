@@ -1,0 +1,17 @@
+<core:FragmentDefinition
+		xmlns="sap.m"
+		xmlns:core="sap.ui.core"
+        xmlns:f="sap.f">
+	<Dialog id="showCentrosDialog" title="Centros">
+        <content >
+            <FlexBox id="centrosDialogLayout" direction="Column" alignItems="End" class="sapUiSmallMargin" >
+                <VBox id="centrosLayout" alignItems="Center" class="sapUiMediumMarginTopBottom" width="100%">
+                    <!-- <f:items>
+                        <Text text="{ path: 'user>/attr/centros', targetType: 'any' }" />
+                    </f:items> -->
+                </VBox>
+                <Button id="closeShowCentrosBtn" text="close" press="onCloseInfoBtnPress" />
+            </FlexBox>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>
