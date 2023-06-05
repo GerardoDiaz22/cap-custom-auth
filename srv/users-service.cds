@@ -8,7 +8,7 @@ service UsersService @(requires: 'authenticated-user'){
             grant: ['*'],
             to   : ['admin']
         }
-    ]) as projection on my.Users;
+    ]) as projection on my.Users excluding { password };
 
     entity RefreshTokens @(restrict: [
         {
