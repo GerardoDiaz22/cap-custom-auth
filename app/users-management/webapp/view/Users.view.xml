@@ -2,47 +2,75 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:core="sap.ui.core"
     xmlns="sap.m">
-    <Page id="page" title="{i18n>title}" showHeader="false">
-        <Table id="idUsersTable" inset="false" items="{
-			path: '/Users'
-		}">
-            <headerToolbar>
-                <OverflowToolbar>
-                    <content>
-                        <Title text="Users" level="H2"/>
-                    </content>
-                </OverflowToolbar>
-            </headerToolbar>
-            <columns>
-                <Column>
-                    <Text text="Name"/>
-                </Column>
-                <Column>
-                    <Text text="Email"/>
-                </Column>
-                <Column>
-                    <Text text="Roles"/>
-                </Column>
-                <Column>
-                    <Text text="Workstations"/>
-                </Column>
-            </columns>
-            <items>
-                <ColumnListItem vAlign="Middle">
-                    <cells>
-                        <ObjectIdentifier title="{username}" text="{ID}"/>
-                    </cells>
-                    <cells>
-                        <Text text="{email}"/>
-                    </cells>
-                    <cells>
-                        <Text text="{ path: 'roles', mode : 'OneTime', targetType: 'any', formatter: '.formatRoles' }"/>
-                    </cells>
-                    <cells>
-                        <Text text="{workstation}"/>
-                    </cells>
-                </ColumnListItem>
-            </items>
-        </Table>
+    <Page id="page" title="{i18n>usersPageTitle}" showHeader="false">
+        <Panel headerText="{i18n>usersPanelTitle}">
+            <Table
+                id="usersTable"
+                mode="SingleSelectMaster"
+                items="{
+                    path: '/Users'
+                }">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <content>
+                            <Title
+                                text="{i18n>usersTableTitle}"
+                                level="H2"/>
+                            <ToolbarSpacer/>
+                            <Button
+                                id="editUsersButton"
+                                icon="sap-icon://edit"
+                                tooltip="{i18n>editButtonText}"
+                                press=".onEditPress"/>
+                            <Button
+                                id="deleteUsersButton"
+                                icon="sap-icon://delete"
+                                tooltip="{i18n>deleteButtonText}"
+                                press=".onDeletePress"/>
+                            <Button
+                                id="refreshUsersButton"
+                                icon="sap-icon://refresh"
+                                tooltip="{i18n>refreshButtonText}"
+                                press=".onRefreshPress"/>
+                            <Button
+                                id="createUsersButton"
+                                icon="sap-icon://add"
+                                tooltip="{i18n>createButtonText}"
+                                press=".onCreatePress"/>
+                        </content>
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>usernameCellText}"/>
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>emailCellText}"/>
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>rolesCellText}"/>
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>workstationsCellText}"/>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem vAlign="Middle">
+                        <cells>
+                            <ObjectIdentifier title="{ path: 'username' }" text="{ path: 'ID' }"/>
+                        </cells>
+                        <cells>
+                            <Text text="{ path: 'email' }"/>
+                        </cells>
+                        <cells>
+                            <Text text="{ path: 'roles', mode : 'OneTime', targetType: 'any', formatter: '.formatRoles' }"/>
+                        </cells>
+                        <cells>
+                            <Text text="{ path: 'workstation' }"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </Panel>
     </Page>
 </mvc:View>

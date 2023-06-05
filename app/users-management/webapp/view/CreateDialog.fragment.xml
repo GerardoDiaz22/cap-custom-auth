@@ -1,0 +1,103 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout">
+	<Dialog
+		id="createDialog"
+		title="{i18n>createUserDialogTitle}"
+		contentWidth="600px">
+		<content>
+            <form:SimpleForm
+                title="{i18n>createUserFormTitle}"
+                maxContainerCols="1"
+                editable="true"
+                layout="ResponsiveGridLayout">
+                <form:content>
+                    <Label
+                        id="nameLabelCreate"
+                        text="{i18n>nameLabelText}"
+                        labelFor="nameInputCreate"/>
+                    <Input
+                        id="nameInputCreate"
+                        type="Text"
+                        value="{ path: 'usersModel>/UserName' }"
+                        class="sapUiSmallMarginBottom"
+                        submit="onSignupPress"
+                        placeholder="{i18n>namePlaceholderText}"
+                        valueState="{ path: 'usersModel>/NameValidationState' }"
+                        valueStateText="{ path: 'usersModel>/NameValidationMessage' }"/>
+                    <Label
+                        id="emailLabelCreate"
+                        text="{i18n>emailLabelText}"
+                        labelFor="emailInputCreate"/> 
+                    <Input
+                        id="emailInputCreate"
+                        type="Email"
+                        value="{ path: 'usersModel>/UserEmail' }"
+                        class="sapUiSmallMarginBottom"
+                        submit="onSignupPress"
+                        placeholder="{i18n>emailPlaceholderText}"
+                        valueState="{ path: 'usersModel>/EmailValidationState' }"
+                        valueStateText="{ path: 'usersModel>/eEmailValidationMessage' }"/>
+                    <Label
+                        id="passwordLabelCreate"
+                        text="{i18n>passwordLabelText}"
+                        labelFor="passwordInputCreate"/>
+                    <Input
+                        id="passwordInputCreate"
+                        type="Password"
+                        value="{ path: 'usersModel>/UserPassword' }"
+                        class="sapUiSmallMarginBottom"
+                        submit="onSignupPress"
+                        placeholder="{i18n>passwordPlaceholderText}"
+                        valueState="{ path: 'usersModel>/PasswordValidationState' }"
+                        valueStateText="{ path: 'usersModel>/PasswordValidationMessage' }"/>
+                    <Label
+                        id="workstationLabelCreate"
+                        text="{i18n>workstationLabelText}"
+                        labelFor="workstationInputCreate"/>
+                    <Select
+                        id="workstationInputCreate"
+                        forceSelection="false"
+                        selectedKey="{ path: 'usersModel>/UserWorkstation' }"
+                        items="{
+                            path: 'usersModel>/Workstations', targetType: 'any'
+                        }"
+                        class="sapUiSmallMarginBottom"
+                        valueState="{ path: 'usersModel>/WorkstationValidationState' }"
+                        valueStateText="{ path: 'usersModel>/WorkstationValidationMessage' }">
+                        <core:Item
+                            key="{ path: 'usersModel>code' }"
+                            text="{ path: 'usersModel>code' }"/>
+                    </Select>
+                    <Label
+                        id="roleLabelCreate"
+                        text="{i18n>rolesLabelText}"
+                        labelFor="roleInputCreate"/>
+			        <CheckBox
+                        text="{i18n>adminRadioText}"
+                        selected="{ path: 'usersModel>/AdminRole' }"
+                        valueState="{ path: 'usersModel>/AdminRoleValidationState' }"/>
+                    <CheckBox
+                        text="{i18n>commonRadioText}"
+                        selected="{ path: 'usersModel>/CommonRole' }"
+                        valueState="{ path: 'usersModel>/CommonRoleValidationState' }"/>
+                </form:content>
+            </form:SimpleForm>
+		</content>
+		<beginButton>
+			<Button
+				text="{i18n>createButtonText}"
+				type="Emphasized"
+				press=".onCreateUserPress"/>
+			<!-- type="Accept" doesn't use desired styling -->
+		</beginButton>
+		<endButton>
+			<Button
+				text="{i18n>closeButtonText}"
+				press=".onCloseCreatePress"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
