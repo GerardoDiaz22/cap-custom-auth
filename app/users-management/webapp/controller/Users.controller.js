@@ -67,7 +67,7 @@ sap.ui.define(
         }
       },
       _validateInput: function (oModel, oUser) {
-        const { username, email, password, roles, workstation } = oUser; //TODO: dont forget about role
+        const { username, email, password, roles, workstation } = oUser;
 
         // Validate name
         if (!username) {
@@ -205,7 +205,6 @@ sap.ui.define(
         // Close dialog
         this.byId('createDialog').close();
       },
-
       onEditPress: function () {
         // Get selected item
         const oSelected = this.byId('usersTable').getSelectedItem();
@@ -274,8 +273,15 @@ sap.ui.define(
         }
         const oUser = { username, email, password, roles, workstation };
 
-        // Validate input
-        if (!this._validateInput(oModel, oUser)) return;
+        // Only validate email input
+        if (!/\S+@\S+\.\S+/.test(email)) {
+          oModel.setProperty('/EmailValidationState', 'Error');
+          oModel.setProperty('/EmailValidationMessage', 'Invalid email format');
+          return;
+        } else {
+          oModel.setProperty('/EmailValidationState', 'None');
+          oModel.setProperty('/EmailValidationMessage', '');
+        }
 
         // Show confirmation dialog
         MessageBox.confirm(this._getText('editConfirmationMessage'), async (oAction) => {
