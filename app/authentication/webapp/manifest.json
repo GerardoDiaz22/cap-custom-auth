@@ -86,11 +86,6 @@
           "pattern": "",
           "name": "login",
           "target": "login"
-        },
-        {
-          "pattern": "signup",
-          "name": "signup",
-          "target": "signup"
         }
       ],
       "targets": {
@@ -100,13 +95,6 @@
           "clearControlAggregation": false,
           "viewId": "login",
           "viewName": "Login"
-        },
-        "signup": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "signup",
-          "viewName": "Signup"
         },
         "notFound": {
           "viewType": "XML",

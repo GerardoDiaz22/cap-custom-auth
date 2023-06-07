@@ -1,5 +1,5 @@
 {
-  "name": "sap-jwt",
+  "name": "CAP-custom-authentication",
   "version": "1.0.0",
   "description": "A simple CAP project.",
   "repository": "<Add your repository here>",
@@ -60,12 +60,12 @@
     }
   },
   "sapux": [
-    "app/products-worklist",
-    "app/sales",
     "app/authentication",
     "app/home",
     "app/error",
-    "app/users-management"
+    "app/users-management",
+    "app/products",
+    "app/sales"
   ],
   "cds": {
     "requires": {

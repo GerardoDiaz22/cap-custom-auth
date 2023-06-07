@@ -3,7 +3,7 @@ sap.ui.define(
     function (Component) {
         "use strict";
 
-        return Component.extend("sap.jwt.app.worklist.productsworklist.Component", {
+        return Component.extend("sofos.products.dummy.products.Component", {
             metadata: {
                 manifest: "json"
             }

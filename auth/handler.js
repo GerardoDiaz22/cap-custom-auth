@@ -23,7 +23,7 @@ module.exports = async (req, res, next) => {
       method: 'GET',
       headers: {
         'X-Csrf-Token': 'Fetch',
-        Authorization: 'Basic U09GT1M6c29mb3NAdGVhbTIwMjM=',
+        Authorization: `Basic ${process.env.SAP_GATEWAY_CONNECT}`,
         Cookie: 'SAP_SESSIONID_R3Q_400=YHKcO80a9Mwm_GNbmlVk1nDp1sPzMxHtn4cAUFaGQqI%3d; sap-usercontext=sap-client=400',
       },
     };

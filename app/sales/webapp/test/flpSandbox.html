@@ -43,10 +43,10 @@
                 }
             },
             applications: {
-                "sapsalessales-tile": {
-                    title: "sales app",
+                "sofossalesdummysales-tile": {
+                    title: "Sales",
                     description: "A Fiori application.",
-                    additionalInformation: "SAPUI5.Component=sap.sales.sales",
+                    additionalInformation: "SAPUI5.Component=sofos.sales.dummy.sales",
                     applicationType: "URL",
                     url: "../"
                 }
@@ -54,17 +54,17 @@
         };
     </script>
 
-    <script src="https://sapui5.hana.ondemand.com/1.112.1/test-resources/sap/ushell/bootstrap/sandbox.js" id="sap-ushell-bootstrap"></script>
+    <script src="https://sapui5.hana.ondemand.com/1.108.16/test-resources/sap/ushell/bootstrap/sandbox.js" id="sap-ushell-bootstrap"></script>
     <!-- Bootstrap the UI5 core library -->
     <script id="sap-ui-bootstrap"
-        src="https://sapui5.hana.ondemand.com/1.112.1/resources/sap-ui-core.js"
+        src="https://sapui5.hana.ondemand.com/1.108.16/resources/sap-ui-core.js"
         data-sap-ui-libs=""
         data-sap-ui-async="true"
         data-sap-ui-preload="async"
-        data-sap-ui-theme="sap_horizon_dark"
+        data-sap-ui-theme="sap_horizon"
         data-sap-ui-compatVersion="edge"
         data-sap-ui-language="en"
-        data-sap-ui-resourceroots='{"sap.sales.sales": "../"}'
+        data-sap-ui-resourceroots='{"sofos.sales.dummy.sales": "../"}'
         data-sap-ui-frameOptions="allow"> // NON-SECURE setting for testing environment
     </script>
 </head>

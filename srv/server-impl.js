@@ -4,7 +4,7 @@ const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
-const { router: authRoutes, requireAuthentication } = require('./auth-routes');
+const { router: authRoutes, requireAuthentication } = require('./auth-routes'); // TODO: to auth/
 
 const impl = async (app) => {
   /* Parse application/json */

@@ -4,16 +4,6 @@ annotate service.Sales with @(
     UI.LineItem : [
         {
             $Type : 'UI.DataField',
-            Label : 'name',
-            Value : name,
-        },
-        {
-            $Type : 'UI.DataField',
-            Label : 'price',
-            Value : price,
-        },
-        {
-            $Type : 'UI.DataField',
             Label : 'sociedad',
             Value : sociedad,
         },
@@ -27,22 +17,22 @@ annotate service.Sales with @(
             Label : 'oficina',
             Value : oficina,
         },
+        {
+            $Type : 'UI.DataField',
+            Label : 'name',
+            Value : name,
+        },
+        {
+            $Type : 'UI.DataField',
+            Label : 'price',
+            Value : price,
+        },
     ]
 );
 annotate service.Sales with @(
     UI.FieldGroup #GeneratedGroup1 : {
         $Type : 'UI.FieldGroupType',
         Data : [
-            {
-                $Type : 'UI.DataField',
-                Label : 'name',
-                Value : name,
-            },
-            {
-                $Type : 'UI.DataField',
-                Label : 'price',
-                Value : price,
-            },
             {
                 $Type : 'UI.DataField',
                 Label : 'sociedad',
@@ -57,6 +47,16 @@ annotate service.Sales with @(
                 $Type : 'UI.DataField',
                 Label : 'oficina',
                 Value : oficina,
+            },
+            {
+                $Type : 'UI.DataField',
+                Label : 'name',
+                Value : name,
+            },
+            {
+                $Type : 'UI.DataField',
+                Label : 'price',
+                Value : price,
             },
         ],
     },

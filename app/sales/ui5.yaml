@@ -1,4 +1,4 @@
 specVersion: "2.5"
 metadata:
-  name: sap.sales.sales
+  name: sofos.sales.dummy.sales
 type: application
