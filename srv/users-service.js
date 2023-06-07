@@ -8,6 +8,6 @@ module.exports = cds.service.impl(async function () {
   });
 
   this.before('UPDATE', 'Users', async (req) => {
-    req.data.password = await bcrypt.hash(req.data.password, 10); // TODO: check if theres a better way to do this
+    req.data.password = await bcrypt.hash(req.data.password, 10); // TODO: add error handling
   });
 });

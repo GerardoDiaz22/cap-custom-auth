@@ -1,35 +1,28 @@
 using {sofos.users as my} from '../db/users-schema';
 
 @path: 'service/users'
-service UsersService @(requires: 'authenticated-user'){
+// @protocol:'rest'
+service UsersService @(requires: 'authenticated-user') {
 
-    entity Users @(restrict: [
-        {
-            grant: ['*'],
-            to   : ['admin']
-        }
-    ]) as projection on my.Users excluding { password };
+    entity Users @(restrict: [{
+        grant: ['*'],
+        to   : ['admin']
+    }]) as projection on my.Users;
 
-    entity RefreshTokens @(restrict: [
-        {
-            grant: ['*'],
-            to   : ['admin']
-        }
-    ]) as projection on my.RefreshTokens;
+    entity RefreshTokens @(restrict: [{
+        grant: ['*'],
+        to   : ['admin']
+    }]) as projection on my.RefreshTokens;
 
-    entity Apps @(restrict: [
-        {
-            grant: ['*'],
-            to   : ['admin']
-        }
-    ]) as projection on my.Apps ;
+    entity Apps @(restrict: [{
+        grant: ['*'],
+        to   : ['admin']
+    }]) as projection on my.Apps;
 
-    entity WorkstationApps @(restrict: [
-        {
-            grant: ['*'],
-            to   : ['admin']
-        }
-    ]) as projection on my.WorkstationApps;
+    entity WorkstationApps @(restrict: [{
+        grant: ['*'],
+        to   : ['admin']
+    }]) as projection on my.WorkstationApps;
 
     function userInfo() returns User;
 
