@@ -23,22 +23,7 @@
 	</f:ShellBar>
     <Page id="page" class="pageContainer" title="{i18n>title}" showHeader="false">
         <content>
-            <!-- <VBox id="userLayout" alignItems="Center" class="sapUiMediumMarginTop">
-                <Panel id="homePanel" class="shadow" width="300px" height="125px">
-                    <FlexBox id="panelLayout" height="100%" alignItems="Center" justifyContent="Center">
-                    <VBox id="subPanelLayout" alignItems="Center">
-                        <HBox id="userInfo" class="sapUiTinyMarginBottom">
-                            <Title  id="usernameText" text="{ path: 'user>/username', targetType: 'any' }"/>
-                            <Title  id="userInitialsText" text="{ path: 'initials>/initials', targetType: 'any' }"/>
-                            <Label id="userSeparator" text="-" class="sapUiTinyMarginBeginEnd"/>
-                            <Title  id="rolesText" text="{ path: 'user>/roles', targetType: 'any', formatter: '.formatRoles' }"/>
-                        </HBox>
-                        <Button id="homeBtnLogout" text="Logout" class="logoutBtn" press="onLogoutPress" />
-                    </VBox>
-                    </FlexBox> 
-                </Panel>
-            </VBox> -->
-            <Title id="appsTitle" text="Applications" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
+            <Title id="appsTitle" text="{i118n>homeApplicationGroupTitle}" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
             <f:GridContainer id="gridContainerApp" class="sapUiMediumMarginBegin" items="{tiles>/apps}">
                 <f:layout>
                     <f:GridContainerSettings id="gridSettingStandardApp" rowSize="5rem" columnSize="5rem" gap="1rem" />
@@ -57,25 +42,6 @@
                     </GenericTile>
                 </f:items>
             </f:GridContainer>
-            <!-- <Title id="servicesTitle" text="Services" class="sapUiMediumMarginTop sapUiSmallMarginBottom sapUiMediumMarginBegin"></Title>
-            <f:GridContainer id="gridContainerSrv" class="sapUiMediumMarginBegin" items="{tiles>/services}">
-                <f:layout>
-                    <f:GridContainerSettings id="gridSettingStandardSrv" rowSize="5rem" columnSize="5rem" gap="1rem" />
-                </f:layout>
-                <f:layoutS>
-                    <f:GridContainerSettings id="gridSettingSmallSrv" rowSize="4rem" columnSize="4rem" gap="0.5rem" />
-                </f:layoutS>
-                <f:items>
-                    <GenericTile
-                    id="genericGridTileSrv"
-                    header="{ path: 'tiles>name' }"
-                    press="onPressSrvTile">
-                        <layoutData>
-                            <f:GridContainerItemLayoutData id="gridLayoutSrv" rows="2" columns="2" />
-                        </layoutData>
-                    </GenericTile>
-                </f:items>
-            </f:GridContainer> -->
         </content>
     </Page>
 </mvc:View>

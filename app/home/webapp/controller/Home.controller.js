@@ -12,8 +12,7 @@ sap.ui.define(
     JSONModel,
     MessageToast,
     Fragment,
-    MenuItem,
-    Button) {
+    MenuItem) {
     'use strict';
 
     return Controller.extend('home.home.controller.Home', {
@@ -21,9 +20,9 @@ sap.ui.define(
         try {
           /* Get user info */
           const { '@odata.context': context, ...oUser } = await $.get('/service/users/userInfo()');
-          
+
           //example user info
-          oUser.attr.centros = ["1001","1003", "1112"]
+          oUser.attr.centros = [{"Name": "1001"},{"Name":"1003"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}, {"Name": "1112"}]
           oUser.attr.sociedades = ["1001","1002"]
           oUser.attr.oficinas = ["1001","1004"]
 
@@ -56,7 +55,6 @@ sap.ui.define(
           console.error(err);
           MessageToast.show(err);
         }
-        this.onUserInfoPress();
       },
       onUserPanelPress: async function () {
         MessageToast.show("user panel")
@@ -189,6 +187,9 @@ sap.ui.define(
       },
       onCloseInfoBtnPress: function() {
         this._oInfoDialog.close();
+      },
+      onCloseShowCentrosBtnPress: function(){
+        this._oShowCentrosDialog.close();
       }
     });
   }
