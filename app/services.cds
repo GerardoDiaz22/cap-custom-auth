@@ -1,6 +1,5 @@
+using from './users-management/annotations';
 
-using from './products-worklist/annotations';
+using from './products/annotations';
 
 using from './sales/annotations';
-
-using from './users-management/annotations';

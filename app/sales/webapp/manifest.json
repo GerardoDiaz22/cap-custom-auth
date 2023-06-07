@@ -1,7 +1,7 @@
 {
-  "_version": "1.45.0",
+  "_version": "1.48.0",
   "sap.app": {
-    "id": "sap.sales.sales",
+    "id": "sofos.sales.dummy.sales",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -11,27 +11,18 @@
     "description": "{{appDescription}}",
     "resources": "resources.json",
     "sourceTemplate": {
-      "id": "@sap/generator-fiori:worklist",
-      "version": "1.7.6",
-      "toolsId": "0a7a45e7-8d91-40f1-baf4-85cca23e9ee4"
+      "id": "@sap/generator-fiori:lrop",
+      "version": "1.9.7",
+      "toolsId": "fe8f2bd5-e45a-414d-9157-500cb08dab6e"
     },
     "dataSources": {
       "mainService": {
-        "uri": "/service/products/",
+        "uri": "/service/finance/",
         "type": "OData",
         "settings": {
-          "annotations": [
-            "annotation"
-          ],
+          "annotations": [],
           "localUri": "localService/metadata.xml",
           "odataVersion": "4.0"
-        }
-      },
-      "annotation": {
-        "type": "ODataAnnotation",
-        "uri": "annotations/annotation.xml",
-        "settings": {
-          "localUri": "annotations/annotation.xml"
         }
       }
     }
@@ -55,7 +46,7 @@
   "sap.ui5": {
     "flexEnabled": true,
     "dependencies": {
-      "minUI5Version": "1.112.1",
+      "minUI5Version": "1.108.16",
       "libs": {
         "sap.m": {},
         "sap.ui.core": {},
@@ -71,7 +62,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "sap.sales.sales.i18n.i18n"
+          "bundleName": "sofos.sales.dummy.sales.i18n.i18n"
         }
       },
       "": {
@@ -115,7 +106,6 @@
             "settings": {
               "entitySet": "Sales",
               "variantManagement": "Page",
-              "hideFilterBar": true,
               "navigation": {
                 "Sales": {
                   "detail": {

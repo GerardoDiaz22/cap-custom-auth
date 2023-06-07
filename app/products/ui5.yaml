@@ -1,4 +1,4 @@
 specVersion: "2.5"
 metadata:
-  name: sap.jwt.app.worklist.productsworklist
+  name: sofos.products.dummy.products
 type: application
